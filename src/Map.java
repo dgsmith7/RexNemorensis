@@ -1,14 +1,17 @@
 /* TODO
-        make a much larger map with more stuff and be sure to update the hardcoded ds from 8 to the correct size
+        make a much larger map with more stuff
  */
 public class Map {
 
     String[] layout;
-    int mapCol = 8;
-    int mapRow = 8;
+    int mapCol;
+    int mapRow;
 
     Map () {
-        System.out.println("Constructing the map.");
+        System.out.println("-------Constructing the map.");
+        // map dimensions follow
+        this.mapCol = 8;
+        this.mapRow = 8;
         this.layout = new String[mapRow];
         this.generateLayout();
         this.locateWeaponsAndMagicItems();
@@ -17,7 +20,7 @@ public class Map {
 
     void generateLayout() {
         // adjust this.mapCol and mapRow appropriately
-        // B - bare, W-wall
+        // B - bare, W-wall, H-Hole
         layout[0] = "BBBBBBBB";
         layout[1] = "BWBBBBHB";
         layout[2] = "BWWWWBBB";
@@ -39,7 +42,7 @@ public class Map {
             }
             if (i == 0) { // axe
                 layout[row] = replaceChar(col, layout[row], 'A');
-            } else if (i > 0 && i < 2) {
+            } else if (i <= 2) {
                 layout[row] = replaceChar(col, layout[row], 'S');
             } else if (i == 3) {
                 layout[row] = replaceChar(col, layout[row], 'D');
@@ -49,9 +52,9 @@ public class Map {
         }
     }
     public void displayMap() {
-        for (int i = 0; i < mapRow; i ++) {
-            for (int j = 0 ; j < mapCol; j ++) {
-                System.out.print(layout[i].charAt(j) + " ");
+        for (int row = 0; row < mapRow; row ++) {
+            for (int col = 0 ; col < mapCol; col ++) {
+                System.out.print(layout[row].charAt(col) + " ");
             }
             System.out.println();
         }
@@ -70,4 +73,11 @@ public class Map {
         return newStr;
     }
 
+    public boolean noWall(int col, int row) {
+        if (this.layout[row].charAt(col) != 'W') {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }

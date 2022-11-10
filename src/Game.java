@@ -11,15 +11,15 @@ public class Game {
     String move;
     Scanner in;
 
-    Game () {
-        System.out.println("Constructing the Game.");
+    Game() {
+        System.out.println("-------Constructing the Game.");
         this.in = new Scanner(System.in);
         this.turnNum = 1;
-        this.gameState= "init";
+        this.gameState = "init";
         this.title = "\n======================\n";
         this.title += "=   Rex Nemorensis   =\n";
         this.title += "======================\n";
-        this.backStory =  "You are a mage and warrior.  For your mettle, you have been honored to serve a priesthood for the Godess Diana.  In this role, your final role, you\n";
+        this.backStory = "You are a mage and warrior.  For your mettle, you have been honored to serve a priesthood for the Godess Diana.  In this role, your final role, you\n";
         this.backStory += "have been cast atop the windswept cliffs of The Grove at Nemi.  In this place there are ruins and holes and cliff edges.  Here you are relegated to\n";
         this.backStory += "stand an endless guard until you are killed by another exiled sole.  Another like you currently stands guard awaiting your challenge to usurp their reign\n";
         this.backStory += "which you shall hold...as long as you live.  For you, a violent death is assured - the question is how soon.  How many battles will you survive if you can\n";
@@ -42,9 +42,7 @@ public class Game {
         protag.showStatus();
         while (this.getState().equals("active")) {
             this.move = getInput();
-            if (inputIsValid(this.move)){
-                this.move = this.processInput(move);
-            }
+            this.processInput(move);
             this.protag.processMove(move);
             this.enemy.processMove(move);
             this.advance();
@@ -56,6 +54,7 @@ public class Game {
         System.out.println(this.title);
         System.out.println(this.backStory);
     }
+
     public String getState() {
         return this.gameState;
     }
@@ -71,40 +70,59 @@ public class Game {
 
     public String getInput() {
         String newInput = "";
-        return newInput;
+        System.out.print("Ponder your next move and press a key: ");
+        newInput = in.nextLine();
+        while (!inputIsValid(newInput)) {
+            newInput = getInput();
+        }
+        return newInput.toUpperCase();
     }
 
-    public String processInput(String s) {
-//    println("You pressed " + key);
-        /*
-        switch(key) {
-            case 'h': this.game.helpReport(); break;
-            case 'i': this.game.protagonist.statusReport(); break;
-            case 'n':
-            case 's':
-            case 'e':
-            case 'w': if(this.game.map.moveIsValid()) {this.game.protagonist.move(key); println(this.game.map.mapReport(this.game.protagonist.positCol, this.game.protagonist.positRow));} break;
-            case 'a': this.game.protagonist.attack(); println(this.game.map.mapReport(this.game.protagonist.positCol, this.game.protagonist.positRow)); break;
-            case '1':
-            case '2':
-            case '3':
-            case '4':
-            case '5': this.game.protagonist.magic(key); println(this.game.map.mapReport(this.game.protagonist.positCol, this.game.protagonist.positRow));break;
-            case 'g': this.game.protagonist.getItem(); println(this.game.map.mapReport(this.game.protagonist.positCol, this.game.protagonist.positRow)); break;
-            default : println("That was not a valid move (Press h for help)."); println(); break;
+    public void processInput(String s) {
+        System.out.println("You pressed " + s);
+        switch (s) {
+            case "H": // help
+                this.showHelpReport();
+                break;
+            case "I": // inventory
+                this.protag.showStatus();
+                break;
+            case "Q": // quit
+                this.gameState = "game-over";
+                break;
+            case "1":// magic
+            case "2":
+            case "3":
+            case "4":
+            case "5":
+//                this.game.protagonist.magic(key);
+//                println(this.game.map.mapReport(this.game.protagonist.positCol, this.game.protagonist.positRow));
+//                break;
+            case "G": // get
+//                this.game.protagonist.getItem();
+//                println(this.game.map.mapReport(this.game.protagonist.positCol, this.game.protagonist.positRow));
+//                break;
+            case "A": // attack
+//                this.game.protagonist.attack();
+//                println(this.game.map.mapReport(this.game.protagonist.positCol, this.game.protagonist.positRow));
+//                break;
+            case "N":
+            case "S":
+            case "E":
+            case "W": // move
+//                if (this.game.map.moveIsValid()) {
+//                    this.game.protagonist.move(key);
+//                    println(this.game.map.mapReport(this.game.protagonist.positCol, this.game.protagonist.positRow));
+//                }
+//                break;
         }
-        println("Ponder your next move and press a key.");
-        println();
-
-         */
-        return s;
     }
 
     public boolean inputIsValid(String _input) {
         if ("hiqHIQ12345gansweGANSWE".contains(_input)) {
             return true;
         } else {
-            System.out.println("That is not a valid move.");
+            System.out.println("That is not a valid move (press H for help).");
             return false;
         }
     }
