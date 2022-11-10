@@ -1,3 +1,5 @@
+import java.util.Scanner;
+
 public class Game {
     int turnNum;
     String gameState;
@@ -6,9 +8,12 @@ public class Game {
     Map map;
     Player protag;
     Player enemy;
+    String move;
+    Scanner in;
 
     Game () {
         System.out.println("Constructing the Game.");
+        this.in = new Scanner(System.in);
         this.turnNum = 1;
         this.gameState= "init";
         this.title = "\n======================\n";
@@ -35,11 +40,16 @@ public class Game {
         showIntro();
         showHelpReport();
         protag.showStatus();
-        while (this.gameState == "active") {
-            getInput();
-            protag.processMove();
-            enemy.processMove();
+        while (this.getState().equals("active")) {
+            this.move = getInput();
+            if (inputIsValid(this.move)){
+                this.move = this.processInput(move);
+            }
+            this.protag.processMove(move);
+            this.enemy.processMove(move);
+            this.advance();
         }
+        this.end();
     }
 
     public void showIntro() {
@@ -54,18 +64,52 @@ public class Game {
         String helpReport = "These do not cost a turn:               These moves cost one turn:\n";
         helpReport += "H - Help                                N, S, E, W - move\n";
         helpReport += "I - Inventory and status                1, 2, 3, 4, 5 - Use Magic Item\n";
-        helpReport += "                                        A - Attack with strongest weapon\n";
+        helpReport += "Q - Quit                                A - Attack with strongest weapon\n";
         helpReport += "                                        G - get item\n";
         System.out.println(helpReport);
     }
 
-    public void getInput() {}
-
-    public boolean inputIsValid(String _input) {
-        return true;
+    public String getInput() {
+        String newInput = "";
+        return newInput;
     }
 
-    public void processOneTurnEach() {
+    public String processInput(String s) {
+//    println("You pressed " + key);
+        /*
+        switch(key) {
+            case 'h': this.game.helpReport(); break;
+            case 'i': this.game.protagonist.statusReport(); break;
+            case 'n':
+            case 's':
+            case 'e':
+            case 'w': if(this.game.map.moveIsValid()) {this.game.protagonist.move(key); println(this.game.map.mapReport(this.game.protagonist.positCol, this.game.protagonist.positRow));} break;
+            case 'a': this.game.protagonist.attack(); println(this.game.map.mapReport(this.game.protagonist.positCol, this.game.protagonist.positRow)); break;
+            case '1':
+            case '2':
+            case '3':
+            case '4':
+            case '5': this.game.protagonist.magic(key); println(this.game.map.mapReport(this.game.protagonist.positCol, this.game.protagonist.positRow));break;
+            case 'g': this.game.protagonist.getItem(); println(this.game.map.mapReport(this.game.protagonist.positCol, this.game.protagonist.positRow)); break;
+            default : println("That was not a valid move (Press h for help)."); println(); break;
+        }
+        println("Ponder your next move and press a key.");
+        println();
+
+         */
+        return s;
+    }
+
+    public boolean inputIsValid(String _input) {
+        if ("hiqHIQ12345gansweGANSWE".contains(_input)) {
+            return true;
+        } else {
+            System.out.println("That is not a valid move.");
+            return false;
+        }
+    }
+
+    public void advance() {
         turnNum++;
     }
 

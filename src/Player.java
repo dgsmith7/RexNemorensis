@@ -12,7 +12,6 @@ public class Player {
         System.out.println("The will show the player status report");
     }
 
-    public void processMove() {
-
+    public void processMove(String s) {
     }
 }
