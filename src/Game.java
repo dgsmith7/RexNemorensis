@@ -1,21 +1,20 @@
 import java.util.Scanner;
 
 public class Game {
-    int turnNum;
-    String gameState;
-    String title;
-    String backStory;
-    Map map;
-    Player protag;
-    Player enemy;
-    String move;
-    Scanner in;
+    public static int turnNum = 1;
+    private static String gameState;
+    private String title;
+    private String backStory;
+    public static GameMap gameMap = new GameMap();
+    public static Player protagonist = new Player("hero", false);
+    public static Player enemy = new Player("villian", true);
+    private final Scanner in;
 
     Game() {
         System.out.println("-------Constructing the Game.");
         this.in = new Scanner(System.in);
-        this.turnNum = 1;
-        this.gameState = "init";
+//        this.turnNum = 1;
+        this.setState("init");
         this.title = "\n======================\n";
         this.title += "=   Rex Nemorensis   =\n";
         this.title += "======================\n";
@@ -30,22 +29,20 @@ public class Game {
         this.backStory += "       The ghastly priest doth reign\n";
         this.backStory += "       The priest who slew the slayer,\n";
         this.backStory += "       And shall himself be slain.    -McCaulay\n";
-        this.map = new Map();
-        this.protag = new Player("hero", false);
-        this.enemy = new Player("villian", true);
-    }
+     }
 
     public void run() {
         this.gameState = "active";
         showIntro();
         showHelpReport();
-        protag.showStatus();
+        protagonist.showStatus();
         while (this.getState().equals("active")) {
-            this.move = getInput();
+            System.out.println(gameMap.mapReport(protagonist.positCol, protagonist.positRow));
+            String move = getInput();
             this.processInput(move);
-            this.protag.processMove(move);
-            this.enemy.processMove(move);
-            this.advance();
+            protagonist.processMove(move);
+            enemy.processMove(move);
+            this.advance(protagonist.turnCodes, enemy.turnCodes);
         }
         this.end();
     }
@@ -56,9 +53,12 @@ public class Game {
     }
 
     public String getState() {
-        return this.gameState;
+        return gameState;
     }
 
+    public void setState (String s) {
+        gameState = s;
+    }
     public void showHelpReport() {
         String helpReport = "These do not cost a turn:               These moves cost one turn:\n";
         helpReport += "H - Help                                N, S, E, W - move\n";
@@ -83,29 +83,35 @@ public class Game {
         switch (s) {
             case "H": // help
                 this.showHelpReport();
+                protagonist.turnCodes[0] = false;
                 break;
             case "I": // inventory
-                this.protag.showStatus();
+                protagonist.showStatus();
+                protagonist.turnCodes[0] = false;
                 break;
             case "Q": // quit
                 this.gameState = "game-over";
+                protagonist.turnCodes[0] = false;
                 break;
             case "1":// magic
             case "2":
             case "3":
             case "4":
             case "5":
-//                this.game.protagonist.magic(key);
+                  protagonist.processMagic(s);
 //                println(this.game.map.mapReport(this.game.protagonist.positCol, this.game.protagonist.positRow));
-//                break;
+                protagonist.turnCodes[0] = true;
+                break;
             case "G": // get
-//                this.game.protagonist.getItem();
+                protagonist.getItem();
 //                println(this.game.map.mapReport(this.game.protagonist.positCol, this.game.protagonist.positRow));
-//                break;
+                protagonist.turnCodes[0] = true;
+                break;
             case "A": // attack
 //                this.game.protagonist.attack();
 //                println(this.game.map.mapReport(this.game.protagonist.positCol, this.game.protagonist.positRow));
-//                break;
+                protagonist.turnCodes[0] = true;
+                break;
             case "N":
             case "S":
             case "E":
@@ -114,7 +120,8 @@ public class Game {
 //                    this.game.protagonist.move(key);
 //                    println(this.game.map.mapReport(this.game.protagonist.positCol, this.game.protagonist.positRow));
 //                }
-//                break;
+                protagonist.turnCodes[0] = true;
+                break;
         }
     }
 
@@ -127,8 +134,10 @@ public class Game {
         }
     }
 
-    public void advance() {
-        turnNum++;
+    public void advance(boolean[] pCodes, boolean[] eCodes) {
+        if (pCodes[0] ) {  // I might need to check both, not sure yet
+            turnNum++;
+        }
     }
 
     void end() {
