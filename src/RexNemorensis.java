@@ -16,6 +16,9 @@ public class RexNemorensis {
 TODO
 Comments
 Magic items messaging and efficacy - all five
+Add a probability - "you dropped youre weapon, buttefingers" when on an edge.
+Draw the map really nicely once at the beginning
+Add a draw map command?
 Refactor slop
 Consider making into a website just for fun in the vein of ZORK, design-wise
  */
