@@ -8,5 +8,6 @@ public class RexNemorensis {
             game = new Game();
             game.run();
         }
+        System.out.println("\nYou defeated " + Game.protagonist.wins + " challengers.");
     }
 }

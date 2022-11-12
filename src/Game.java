@@ -38,15 +38,15 @@ public class Game {
         setState("active");
         showIntro();
          while (getState().equals("active")) {
-            System.out.println(gameMap.mapReport(protagonist.positCol, protagonist.positRow));
+            gameMap.mapReport(protagonist.positCol, protagonist.positRow);
             String move = getInput("Ponder your next move and press a key: ");
             this.processInput(move, protagonist);
-            if (!move.equals("Q")) this.advance(move, protagonist.turnCodes, enemy.turnCodes, protagonist, enemy);
+            if (!("QIH".contains(move))) this.advance(move, protagonist.turnCodes, enemy.turnCodes, protagonist, enemy);
 //            System.out.println("-----------------------------");
-            if (getState().equals("active")) {  /// maybe add and move != h i
+            if (getState().equals("active") && (!"QIH".contains(move))) {
                 move = enemy.generateBotMove();
                 this.processInput(move, enemy);
-                if (!move.equals("Q")) this.advance(move, protagonist.turnCodes, enemy.turnCodes, enemy, protagonist);
+                this.advance(move, protagonist.turnCodes, enemy.turnCodes, enemy, protagonist);
  //               System.out.println("-----------------------------");
             }
         }
@@ -57,6 +57,7 @@ public class Game {
     private void reset() {
         setState("active");
 //        System.out.println("-------Resetting");
+        // actually write the rest code here soon
     }
 
     public void showIntro() {
@@ -70,6 +71,7 @@ public class Game {
             System.out.println();
             System.out.println("-----------------------------");
             System.out.println(this.continueStory);
+            protagonist.showStatus();
         }
     }
 
@@ -106,13 +108,11 @@ public class Game {
 
     public static void getReturn() {
         String k = "";
-        System.out.println("Press ENTER to continue.\n");
+        System.out.print("Press ENTER to continue.\n");
         k = in.nextLine();
         while (!k.equals("")) {
-            k = in.nextLine();
             getReturn();
         }
-        System.out.println("");
     }
 
     public void processInput(String s, Player p) {

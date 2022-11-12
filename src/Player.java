@@ -1,4 +1,6 @@
+import java.net.SocketOption;
 import java.util.Scanner;
+import java.util.function.DoubleToIntFunction;
 
 import static java.lang.Integer.valueOf;
 
@@ -74,6 +76,7 @@ public class Player {
         if (this.speed > 0) System.out.println("   Crown of speed");
         int magicSum = this.invisibility + this.strength + this.restoration + this.protection + this.speed;
         if (magicSum == 0) System.out.println("   none");
+        System.out.println("You have defeated " + wins + " challengers.");
         System.out.println();
         Game.getReturn();
     }
@@ -295,35 +298,46 @@ public class Player {
         }
     }
 
-    public boolean edgeFall(String dir) {
+    public boolean edgeFall(String dir) {  // bot checking to see if it will fall off edge
         return (this.positCol == 0 && (dir.equals("W")) ||
                 (this.positCol == GameMap.mapCol - 1 && dir.equals("E")) ||
                 (this.positRow == 0 && dir.equals("N")) ||
                 (this.positRow == GameMap.mapRow - 1 && dir.equals("S")));
     }
 
-    public boolean edgeWall(String dir) {
+    public boolean edgeWall(String dir) {  // bot checking for walls when at edge
+         // the edges of the map will never have walls
         /*
-        if you are not on east edge and (dir is e and the string is not W)
-        or if you are not on west edge and (dir is w and the string in not w)
-        or if you are not on the south edge and (dir is s and the string is not w)
-        or if you are not on the north edge and (dir is n and the string is not w)
+        if col is eastmost and dir is west and w != w then move is safe
+        if col is westmost and dir is east and e != w then move is safe
+        if row is southmost and dir is north and n != w then move is safe
+        if row is northmost and dir is south and s != w then move is safe
+         and
+        if you are not on east edge and (dir is e and the string is not W) then move is safe
+        or if you are not on west edge and (dir is w and the string in not w) then move is safe
+        or if you are not on the south edge and (dir is s and the string is not w) then move is safe
+        or if you are not on the north edge and (dir is n and the string is not w) then move is safe
          */
-        return ((this.positCol != GameMap.mapCol - 1 && (dir.equals("E") && !String.valueOf(GameMap.layout[positRow].charAt(positCol + 1)).equals("W"))) ||
+        return (((this.positCol == GameMap.mapCol - 1 && (dir.equals("W") && !String.valueOf(GameMap.layout[positRow].charAt(positCol - 1)).equals("W"))) ||
+                (this.positCol == 0 && (dir.equals("E") && !String.valueOf(GameMap.layout[positRow].charAt(positCol + 1)).equals("W"))) ||
+                (this.positRow == GameMap.mapRow - 1 && (dir.equals("N") && !String.valueOf(GameMap.layout[positRow - 1].charAt(positCol)).equals("W"))) ||
+                (this.positRow == 0 && (dir.equals("S") && !String.valueOf(GameMap.layout[positRow + 1].charAt(positCol)).equals("W")))))
+                ||
+                (((this.positCol != GameMap.mapCol - 1 && (dir.equals("E") && !String.valueOf(GameMap.layout[positRow].charAt(positCol + 1)).equals("W"))) ||
                 (this.positCol != 0 && (dir.equals("W") && !String.valueOf(GameMap.layout[positRow].charAt(positCol - 1)).equals("W"))) ||
                 (this.positRow != GameMap.mapRow - 1 && (dir.equals("S") && !String.valueOf(GameMap.layout[positRow + 1].charAt(positCol)).equals("W"))) ||
-                (this.positRow != 0 && (dir.equals("N") && !String.valueOf(GameMap.layout[positRow - 1].charAt(positCol)).equals("W"))));
+                (this.positRow != 0 && (dir.equals("N") && !String.valueOf(GameMap.layout[positRow - 1].charAt(positCol)).equals("W")))));
     }
 
-    public boolean nonEdgeWall (String dir) {
+    public boolean nonEdgeWall (String dir) {  // bot checking for walls when not at edge
         String n = String.valueOf(GameMap.layout[positRow - 1].charAt(positCol));
-        System.out.println("-------North is " + n);
+//        System.out.println("-------North is " + n);
         String e = String.valueOf(GameMap.layout[positRow].charAt(positCol + 1));
-        System.out.println("-------East is " + e);
+//        System.out.println("-------East is " + e);
         String s = String.valueOf(GameMap.layout[positRow + 1].charAt(positCol));
-        System.out.println("-------South is " + s);
+//        System.out.println("-------South is " + s);
         String w = String.valueOf(GameMap.layout[positRow].charAt(positCol - 1));
-        System.out.println("-------West is " + w);
+//        System.out.println("-------West is " + w);
         return !((n.equals("W") && dir.equals("N")) ||
                 (s.equals("W") && dir.equals("S")) ||
                 (e.equals("W") && dir.equals("E")) ||
@@ -331,7 +345,7 @@ public class Player {
 
     }
 
-    public String generateBotMove() {
+    public String getSafeDir() {  // bot getting direction to try and checking it out
         /*
         get a dir
         safe is false
@@ -343,7 +357,6 @@ public class Player {
             else...not on an edge
                 check for a wall - if wall mark unsafe
          */
-//        System.out.println("-------calculating a bot move from " + positRow + " " + positCol);
         String dir = "N";
         dir = getRandomDir(dir);
         boolean safe = false;
@@ -358,7 +371,8 @@ public class Player {
                     safe = (!edgeFall(dir));
                 }
 //                System.out.println("-------After prob check, move " + dir + " safety is " + safe);
-                safe = safe || edgeWall(dir);
+                safe = safe && edgeWall(dir);
+//                System.out.println("-------safe is " + safe + " edgeWallCheck is " + edgeWall(dir));
 //                System.out.println("-------After edge wall check, move " + dir + " safety is " + safe);
             } else { // not on an edge
 //                System.out.println("-------Enemy on a ledge");
@@ -366,7 +380,13 @@ public class Player {
 //                System.out.println("-------After non-edge wall check, move " + dir + " safety is " + safe);
             }
         }
+        return dir;
+    }
 
+    public String generateBotMove() {
+
+//        System.out.println("-------calculating a bot move from " + positRow + " " + positCol);
+String dir = getSafeDir();
         if (Game.nearEachOther()) {  // if enemy in strike distance
             if (this.health >= 50) { // attack if health above 50
 //                System.out.println("-------done calculating. A > 50");
@@ -405,7 +425,7 @@ public class Player {
         }
     }
 
-    public String getRandomDir(String dir) {
+    public String getRandomDir(String dir) {  // bot getting initial direction during move process
         switch ((int) (Math.random() * 4)) {
             case 0:
                 dir = "N";

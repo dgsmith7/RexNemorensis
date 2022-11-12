@@ -88,14 +88,15 @@ public class GameMap {
         }
     }
 
-    public String mapReport(int col, int row) {
-        String report = "";
+    public void mapReport(int col, int row) {
+        String report = "You are located on coordinate " + Game.protagonist.positRow + " - " + Game.protagonist.positCol + "\n";
+        report += "Your spot your enemy on coordinate " + Game.enemy.positRow + " - " + Game.enemy.positCol + "\n";
         char nChar = 'L';
         char sChar = 'L';
         char wChar = 'L';
         char eChar = 'L';
         boolean signif = false;
-        System.out.println();
+//        System.out.println();
 //        System.out.println("-------You are on col " + col + " row " + row + ". The map code is " + layout[row].charAt(col));
 //        System.out.println("-------Its turn number " + Game.turnNum);
         // look in each direction for stuff
@@ -113,69 +114,68 @@ public class GameMap {
         }
         // holes
         if (nChar == 'H' || sChar == 'H' || wChar == 'H' || eChar == 'H') {
-            report += "A foul, hot stench rises from a nearby hole in the ground. ";
+            report += "A foul, hot stench rises from a nearby hole in the ground.\n";
         }
         // walls
-        if (nChar == 'W') report += "A raven circles high above the wall of a ruin to the North. ";
-        if (sChar == 'W') report += "You feel the cool moisture of a stone wall to your South. ";
-        if (wChar == 'W') report += "A granite boulder to the West blocks out the light. ";
-        if (eChar == 'W') report += "The east is impassable due to a barrier. ";
+        if (nChar == 'W') report += "A raven circles high above the wall of a ruin to the North.\n";
+        if (sChar == 'W') report += "You feel the cool moisture of a stone wall to your South.\n";
+        if (wChar == 'W') report += "A granite boulder to the West blocks out the light.\n";
+        if (eChar == 'W') report += "The east is impassable due to a barrier.\n";
         // edges
         if (row == 0) {
-            report += "The view is great, but you feel your stomach tighten as you slip on some gravel near the Northern precipice. ";
+            report += "The view is great, but you feel your stomach tighten as you slip on some gravel near the Northern precipice.\n";
         }
         if (row == 7) {
-            report += "Something deep below your guts begins to pucker because your are near the high Southern rim. ";
+            report += "Something deep below your guts begins to pucker because your are near the high Southern rim.\n";
         }
         if (col == 0) {
-            report += "Your head feels light and your vision grows dim near the Western cliff-edge of the grove. ";
+            report += "Your head feels light and your vision grows dim near the Western cliff-edge of the grove.\n";
         }
         if (col == 7) {
-            report += "Your knees tremble as you peer over the Eastern ledge at the gorgeous vista of Lake Nemi. ";
+            report += "Your knees tremble as you peer over the Eastern ledge at the gorgeous vista of Lake Nemi.\n";
         }
         // magic items
         if (layout[row].charAt(col) == '1') {
-            report += "You see a scarlet cloak among a pile of bones here. ";
+            report += "You see a scarlet cloak among a pile of bones here.\n";
             signif = true;
         }
         if (layout[row].charAt(col) == '2') {
-            report += "A metal glove hangs from a golden bough of a nearby dead tree.";
+            report += "A metal glove hangs from a golden bough of a nearby dead tree.\n";
             signif = true;
         }
         if (layout[row].charAt(col) == '3') {
-            report += "There is a delicate clay bottle containing an iridescent liquid atop an altar.";
+            report += "There is a delicate clay bottle containing an iridescent liquid atop an altar.\n";
             signif = true;
         }
         if (layout[row].charAt(col) == '4') {
-            report += "A ring with an inscription, smelt of rare metal, that is laying at your feet, begins to vibrate.";
+            report += "A ring with an inscription, smelt of rare metal, that is laying at your feet, begins to vibrate.\n";
             signif = true;
         }
         if (layout[row].charAt(col) == '5') {
-            report += "An ornate crown fit for a king glows brightly as you approach.";
+            report += "An ornate crown fit for a king glows brightly as you approach.\n";
             signif = true;
         }
         // weapons
         if (layout[row].charAt(col) == 'A') {
-            report += "A heavy axe with a keen edge is stuck in a nearby stump. ";
+            report += "A heavy axe with a keen edge is stuck in a nearby stump.\n";
             signif = true;
         }
         if (layout[row].charAt(col) == 'S') {
-            report += "You hear a low hum coming from a well-crafted sword on the ground. ";
+            report += "You hear a low hum coming from a well-crafted sword on the ground.\n";
             signif = true;
         }
         if (layout[row].charAt(col) == 'D') {
-            report += "You see a sturdy shield propped on a rock. ";
+            report += "You see a sturdy shield propped on a rock.\n";
             signif = true;
         }
         // enemy
         if ((Math.abs(Game.protagonist.getPositCol() - Game.enemy.positCol) <= 1) && (Math.abs(Game.protagonist.positRow - Game.enemy.positRow) <= 1)) {
-            report += "Your adreneline surges as you sense the closeness of your enemy. ";
+            report += "Your adreneline surges as you sense the closeness of your enemy.\n";
             signif = true;
         }
         if (!signif) {
-            report += "There is nothing else to see here. ";
+            report += "There is nothing else to see here.\n";
         }
-        report += "\n";
-        return report;
+        System.out.println(report);
     }
 }
