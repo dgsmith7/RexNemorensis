@@ -21,10 +21,10 @@ public class GameMap {
     public void generateLayout() {
         // adjust this.mapCol and mapRow appropriately
         // B - bare, W-wall, H-Hole
-        layout[0] = "12345ASD";  // for testing
-        layout[1] = "HWBBBBHB";  // for testing
-//        layout[0] = "BBBBBBBB";
-//        layout[1] = "BWBBBBHB";
+//        layout[0] = "A3345ASD";  // for testing
+//        layout[1] = "HWBBBBHB";  // for testing
+        layout[0] = "BBBBBBBB";
+        layout[1] = "BWBBBBHB";
         layout[2] = "BWWWWBBB";
         layout[3] = "BWBBWBBB";
         layout[4] = "BBBBWBWB";
@@ -97,7 +97,7 @@ public class GameMap {
         boolean signif = false;
         System.out.println();
 //        System.out.println("-------You are on col " + col + " row " + row + ". The map code is " + layout[row].charAt(col));
-        System.out.println("-------Its turn number " + Game.turnNum);
+//        System.out.println("-------Its turn number " + Game.turnNum);
         // look in each direction for stuff
         if (col != 0) {
             wChar = layout[row].charAt(col-1);
@@ -175,6 +175,7 @@ public class GameMap {
         if (!signif) {
             report += "There is nothing else to see here. ";
         }
+        report += "\n";
         return report;
     }
 }

@@ -35,20 +35,20 @@ public class Game {
     }
 
     public void run() {
-       setState("active");
+        setState("active");
         showIntro();
-         while (getState().equals("active")) {
+        while (getState().equals("active")) {
             System.out.println(gameMap.mapReport(protagonist.positCol, protagonist.positRow));
             String move = getInput("Ponder your next move and press a key: ");
             this.processInput(move, protagonist);
-             this.advance(protagonist.turnCodes, enemy.turnCodes, protagonist, enemy);
-            System.out.println("-----------------------------");
+            this.advance(move, protagonist.turnCodes, enemy.turnCodes, protagonist, enemy);
+//            System.out.println("-----------------------------");
             if (getState().equals("active")) {
                 move = enemy.generateBotMove();
                 this.processInput(move, enemy);
+                this.advance(move, protagonist.turnCodes, enemy.turnCodes, enemy, protagonist);
+ //               System.out.println("-----------------------------");
             }
-             this.advance(protagonist.turnCodes, enemy.turnCodes, enemy, protagonist);
-            System.out.println("-----------------------------");
         }
         this.end(endName);
         this.reset();
@@ -56,11 +56,10 @@ public class Game {
 
     private void reset() {
         setState("active");
-        System.out.println("-------Resetting");
+//        System.out.println("-------Resetting");
     }
 
     public void showIntro() {
-
         if (protagonist.wins == 0) {
             System.out.println(this.title);
             System.out.println(this.backStory);
@@ -84,12 +83,12 @@ public class Game {
 
     public void showHelpReport() {
         String helpReport = "-----------------------------HELP----------------------------------\n";
-        helpReport +=       "| These do not cost a turn:     These moves cost one turn:        |\n";
-        helpReport +=       "|  H - Help                      N, S, E, W - move                |\n";
-        helpReport +=       "|  I - Inventory and status      1, 2, 3, 4, 5 - Use Magic Item   |\n";
-        helpReport +=       "|  Q - Quit                      A - Attack with strongest weapon |\n";
-        helpReport +=       "|                                G - get item                     |\n";
-        helpReport +=       "-------------------------------------------------------------------\n";
+        helpReport += "| These do not cost a turn:     These moves cost one turn:        |\n";
+        helpReport += "|  H - Help                      N, S, E, W - move                |\n";
+        helpReport += "|  I - Inventory and status      1, 2, 3, 4, 5 - Use Magic Item   |\n";
+        helpReport += "|  Q - Quit                      A - Attack with strongest weapon |\n";
+        helpReport += "|                                G - get item                     |\n";
+        helpReport += "-------------------------------------------------------------------\n";
         System.out.println(helpReport);
         Game.getReturn();
     }
@@ -101,29 +100,34 @@ public class Game {
         while (!inputIsValid(newInput)) {
             newInput = getInput(prompt);
         }
+        System.out.println();
         return newInput.toUpperCase();
     }
 
     public static void getReturn() {
         String k = "";
-        System.out.println("Press enter to continue.\n");
+        System.out.println("Press ENTER to continue.\n");
         k = in.nextLine();
         while (!k.equals("")) {
             k = in.nextLine();
             getReturn();
         }
-        System.out.println("-----------------------------");
+        System.out.println("");
     }
 
     public void processInput(String s, Player p) {
 //        System.out.println("-------You pressed " + s);
         switch (s) {
             case "H": // help
-                this.showHelpReport();
+                if (p.name.equals("hero")) {
+                    this.showHelpReport();
+                }
                 p.turnCodes[0] = false;
                 break;
             case "I": // inventory
-                p.showStatus();
+                if (p.name.equals("hero")) {
+                    p.showStatus();
+                }
                 p.turnCodes[0] = false;
                 break;
             case "Q": // quit
@@ -166,14 +170,11 @@ public class Game {
         }
     }
 
-    public void advance(boolean[] pCodes, boolean[] eCodes, Player pri, Player sec) {
-        int finalDamage = pri.damage;
-        // inc the turn num
-        if (pCodes[0]) {
-            turnNum++;
-        }
-        // calculate and apply damages
-        String magicStuff = " while wearing: \n";
+    public void advance(String m, boolean[] pCodes, boolean[] eCodes, Player pri, Player sec) {
+        // calculate and apply damages if an attack
+        if (m.equals("A")) {
+            int finalDamage = pri.damage;
+            String magicStuff = " while wearing a loin cloth and the following magic items: \n";
             if (pri.turnCodes[1]) {  // invis
                 finalDamage = 0;
                 magicStuff += "The Cloak of Invisibilty \n";
@@ -182,116 +183,131 @@ public class Game {
                 finalDamage += 2;
                 magicStuff += "The Gauntlet of Strength \n";
             }
-            if (pri.turnCodes[3]) {  //  retoration
-                pri.health += 3;
-                if (pri.name.equals("hero")) {
-                    System.out.println("Ahhhhh! The tincture kicked in, increasing your health by 3.");
-                }
-            }
+            // restoration handled below and in player class
             // shield handled below and in player class
             if (pri.turnCodes[5]) {  // speed
                 finalDamage *= 2;
                 magicStuff += "The Crown of Speed \n";
             }
-        finalDamage -= pri.shield;
-            sec.health -= finalDamage;
-            // messaging
-        String top;
-        String bottom;
-        if (pri.name.equals("hero")) {
-            top = "You";
-            bottom = "The enemy";
+            if (magicStuff.equals(" while wearing a loin cloth and the following magic items: \n")) {
+                magicStuff += "none.";
+            }
+            if (Game.nearEachOther()) {
+                finalDamage -= pri.shield;
+                sec.health -= finalDamage;
+                // messaging
+                String top;
+                String bottom;
+                if (pri.name.equals("hero")) {
+                    top = "You";
+                    bottom = "The enemy";
+                } else {
+                    top = "The enemy";
+                    bottom = "You";
+                }
+                System.out.println(top + " struck with the " + pri.weapon + " inflicting " + finalDamage + " points damage, " + magicStuff);
+                System.out.println("Your health is " + protagonist.health + ".  The enemy's health is " + enemy.health);
+            }
+        }
+        // check for death
+        if (sec.health <= 0) {
+            System.out.println("You hear the tolling of a death knell.");
+            setState("game-over");
+            endName = "enemy";
         } else {
-            top = "The enemy";
-            bottom = "You";
-        }
-        System.out.println(top + " struck with " + pri.weapon + " inflicting " + finalDamage + "points, " + magicStuff);
-        System.out.println("Your health is " + protagonist.health + ".  The enemy's health is " + enemy.health);
-        // magic depletion
-        if (protagonist.invisibility > 0) {
-            protagonist.invisibility--;
-            if (protagonist.invisibility == 0) {
-                pCodes[1] = false;
-                System.out.println("You suddenly fade back into the realm of the visible as the cloak loses its power.");
-                protagonist.magicItems[0] = null;
-            } else {
-                System.out.println("You magic invisibility is wearing off.");
-            }
-        }
-        if (protagonist.strength > 0) {
-            protagonist.strength--;
-            if (protagonist.strength == 0) {
-                pCodes[2] = false;
-                System.out.println("You weapon feels heavier once again.");
-                protagonist.magicItems[1] = null;
-            } else {
-                System.out.println("You magic strength is wearing off.");
-            }
-        }
-        if (protagonist.restoration > 0) {
-            protagonist.restoration--;
-            if (protagonist.restoration == 0) {
-                pCodes[3] = false;
-                System.out.println("You look around for a place to nap and recharge as your magic health dissipates.");
-                protagonist.magicItems[2] = null;
-            } else {
-                System.out.println("You magic restoration is wearing off.");
-            }
-        }
-        if (protagonist.protection > 0) {
-            protagonist.protection--;
-            if (protagonist.protection == 0) {
-                protagonist.shield -= 2;
-                pCodes[4] = false;
-                System.out.println("The aura that once enveloped you swirls away.  You feel naked without your magic shield.");
-                protagonist.magicItems[3] = null;
-            } else {
-                System.out.println("You magic protection is wearing off.");
-            }
-        }
-        if (protagonist.speed > 0) {
-            protagonist.speed--;
-            if (protagonist.speed == 0) {
-                pCodes[5] = false;
-                System.out.println("You take a practice swing of your weapon and it feels like its moving in slow motion as your magic speed wanes like the moon.");
-                protagonist.magicItems[4] = null;
-            } else {
-                System.out.println("You magic strength is wearing off.");
-            }
-        }
-        if (enemy.invisibility > 0) {
-            enemy.invisibility--;
-            if (enemy.invisibility == 0) {
-                eCodes[1] = false;
-                enemy.magicItems[0] = null;
-            }
-        }
-        if (enemy.strength > 0) {
-            enemy.strength--;
-            if (enemy.strength == 0) {
-                eCodes[2] = false;
-                enemy.magicItems[1] = null;
-            }
-        }
-        if (enemy.restoration > 0) {
-            enemy.restoration--;
-            if (enemy.restoration == 0) {
-                eCodes[3] = false;
-                enemy.magicItems[2] = null;
-            }
-        }
-        if (enemy.protection > 0) {
-            enemy.protection--;
-            if (enemy.protection == 0) {
-                eCodes[4] = false;
-                enemy.magicItems[3] = null;
-            }
-        }
-        if (enemy.speed > 0) {
-            enemy.speed--;
-            if (enemy.speed == 0) {
-                eCodes[5] = false;
-                enemy.magicItems[4] = null;
+            // inc the turn num
+            if (protagonist.turnCodes[0]) {
+                turnNum++;
+                protagonist.turnCodes[0] = false;
+                // magic depletion
+                if (protagonist.invisibility > 0) {
+                    protagonist.invisibility--;
+                    if (protagonist.invisibility == 0) {
+                        protagonist.turnCodes[1] = false;
+                        System.out.println("You suddenly fade back into the realm of the visible as the cloak loses its power.");
+                        protagonist.magicItems[0] = null;
+                    } else {
+                        System.out.println("You magic invisibility is wearing off.");
+                    }
+                }
+                if (protagonist.strength > 0) {
+                    protagonist.strength--;
+                    if (protagonist.strength == 0) {
+                        protagonist.turnCodes[2] = false;
+                        System.out.println("You weapon feels heavier once again.");
+                        protagonist.magicItems[1] = null;
+                    } else {
+                        System.out.println("You magic strength is wearing off.");
+                    }
+                }
+                if (protagonist.restoration > 0) {
+                    protagonist.restoration--;
+                    protagonist.health += 3;
+                    System.out.println("Ahhhhh! The tincture kicked in, increasing your health is now " + protagonist.health);
+                    if (protagonist.restoration == 0) {
+                        protagonist.turnCodes[3] = false;
+                        System.out.println("You look around for a place to nap and recharge as your magic health dissipates.");
+                        protagonist.magicItems[2] = null;
+                    } else {
+                        System.out.println("You magic restoration is wearing off.");
+                    }
+                }
+                if (protagonist.protection > 0) {
+                    protagonist.protection--;
+                    if (protagonist.protection == 0) {
+                        protagonist.shield -= 2;
+                        protagonist.turnCodes[4] = false;
+                        System.out.println("The aura that once enveloped you swirls away.  You feel naked without your magic shield.");
+                        protagonist.magicItems[3] = null;
+                    } else {
+                        System.out.println("You magic protection is wearing off.");
+                    }
+                }
+                if (protagonist.speed > 0) {
+                    protagonist.speed--;
+                    if (protagonist.speed == 0) {
+                        protagonist.turnCodes[5] = false;
+                        System.out.println("You take a practice swing of your weapon and it feels like its moving in slow motion as your magic speed wanes like the moon.");
+                        protagonist.magicItems[4] = null;
+                    } else {
+                        System.out.println("You magic strength is wearing off.");
+                    }
+                }
+                if (enemy.invisibility > 0) {
+                    enemy.invisibility--;
+                    if (enemy.invisibility == 0) {
+                        enemy.turnCodes[1] = false;
+                        enemy.magicItems[0] = null;
+                    }
+                }
+                if (enemy.strength > 0) {
+                    enemy.strength--;
+                    if (enemy.strength == 0) {
+                        enemy.turnCodes[2] = false;
+                        enemy.magicItems[1] = null;
+                    }
+                }
+                if (enemy.restoration > 0) {
+                    enemy.restoration--;
+                    if (enemy.restoration == 0) {
+                        enemy.turnCodes[3] = false;
+                        enemy.magicItems[2] = null;
+                    }
+                }
+                if (enemy.protection > 0) {
+                    enemy.protection--;
+                    if (enemy.protection == 0) {
+                        enemy.turnCodes[4] = false;
+                        enemy.magicItems[3] = null;
+                    }
+                }
+                if (enemy.speed > 0) {
+                    enemy.speed--;
+                    if (enemy.speed == 0) {
+                        enemy.turnCodes[5] = false;
+                        enemy.magicItems[4] = null;
+                    }
+                }
             }
         }
     }
@@ -303,8 +319,10 @@ public class Game {
             System.out.println("You are victorious. ");
             protagonist.wins++;
             System.out.println("You have defeated " + protagonist.wins + " challengers.");
+            System.out.println();
         } else if (n.equals("hero")) {
             System.out.println("You are defeated. A haloed child touches your head. You hear their whisper from behind, 'All glory is fleeting...'");
+            System.out.println();
             RexNemorensis.replay = checkReplay().startsWith("Y");
         } else {
             RexNemorensis.replay = checkReplay().startsWith("Y");

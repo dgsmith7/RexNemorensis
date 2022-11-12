@@ -8,7 +8,5 @@ public class RexNemorensis {
             game = new Game();
             game.run();
         }
-        }
-
-
+    }
 }
