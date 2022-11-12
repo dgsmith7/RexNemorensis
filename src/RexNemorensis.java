@@ -11,3 +11,11 @@ public class RexNemorensis {
         System.out.println("\nYou defeated " + Game.protagonist.wins + " challengers.");
     }
 }
+
+/*
+TODO
+Comments
+Magic items messaging and efficacy - all five
+Refactor slop
+Consider making into a website just for fun in the vein of ZORK, design-wise
+ */
