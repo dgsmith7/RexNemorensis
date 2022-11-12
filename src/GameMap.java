@@ -116,7 +116,7 @@ public class GameMap {
             report += "A foul, hot stench rises from a nearby hole in the ground. ";
         }
         // walls
-        if (nChar == 'W') report += "A raven circle high above the wall of a ruin to the North. ";
+        if (nChar == 'W') report += "A raven circles high above the wall of a ruin to the North. ";
         if (sChar == 'W') report += "You feel the cool moisture of a stone wall to your South. ";
         if (wChar == 'W') report += "A granite boulder to the West blocks out the light. ";
         if (eChar == 'W') report += "The east is impassable due to a barrier. ";

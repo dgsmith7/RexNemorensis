@@ -29,8 +29,8 @@ public class Player {
         this.name = _name;
         this.bot = _bot;
         if (_bot) {
-            this.positCol = 3;//GameMap.mapCol-1;
-            this.positRow = 0;//GameMap.mapRow-1;
+            this.positCol = GameMap.mapCol-1;
+            this.positRow = GameMap.mapRow-1;
         } else {
             this.positCol = 0;
             this.positRow = 0;
@@ -90,7 +90,7 @@ public class Player {
                 this.positRow--;
                 System.out.println("North");
             } else {
-                System.out.println(" but something blocks the path.");
+                System.out.println("but something blocks the path.");
             }
         }
         if (s.equals("S")) {
@@ -98,7 +98,7 @@ public class Player {
                 this.positRow++;
                 System.out.println("South");
             } else {
-                System.out.println(" but something blocks the path.");
+                System.out.println("but something blocks the path.");
             }
         }
         if (s.equals("W")) {
@@ -106,7 +106,7 @@ public class Player {
                 this.positCol--;
                 System.out.println("West");
             } else {
-                System.out.println(" but something blocks the path.");
+                System.out.println("but something blocks the path.");
             }
         }
         if (s.equals("E")) {
@@ -114,7 +114,7 @@ public class Player {
                 this.positCol++;
                 System.out.println("East");
             } else {
-                System.out.println(" but something blocks the path.");
+                System.out.println("but something blocks the path.");
             }
         }
 //        System.out.println("-------" + name + " is now on " + this.positCol + " - " + this.positRow);
@@ -285,6 +285,7 @@ public class Player {
     }
 
     public String generateBotMove() {
+        System.out.println("-------calculating a bot move");
         String dir = "N";
         dir = getRandomDir(dir);
         int probSure = (int)(Math.random() * 9) + 1;
@@ -300,29 +301,39 @@ public class Player {
         }
         if (Game.nearEachOther()) {  // if enemy in strike distance
             if (this.health >= 50) { // attack if health above 50
+                System.out.println("-------done calculating.");
                 return "A";
             } else if (this.health >= 20) { // magic first then attack if between 20 and 50
                 if (this.magicItems[0] != null) {
+                    System.out.println("-------done calculating. 1");
                     return "1";
                 } else if (this.magicItems[1] != null) {
+                    System.out.println("-------done calculating. 2");
                     return "2";
                 } else if (this.magicItems[2] != null) {
+                    System.out.println("-------done calculating. 3");
                     return "3";
                 } else if (this.magicItems[3] != null) {
+                    System.out.println("-------done calculating. 4");
                     return "4";
                 } else if (this.magicItems[4] != null) {
+                    System.out.println("-------done calculating. 5");
                     return "5";
                 } else {
+                    System.out.println("-------done calculating. A");
                     return "A";
                 }
             } else { // or run away if lower than 20
+                System.out.println("-------done calculating." + dir);
                 return dir;
             }
             // or if there is no enemey and there is something to pick up, do it
         } else if ("ASD12345".contains(String.valueOf(GameMap.layout[this.positRow].charAt(this.positCol)))) { // something to get
+            System.out.println("-------done calculating. G");
                 return "G";
         }
         else { // otherwise just move
+            System.out.println("-------done calculating." + dir);
             return dir;
         }
     }

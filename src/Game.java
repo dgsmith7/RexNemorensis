@@ -43,7 +43,7 @@ public class Game {
             this.processInput(move, protagonist);
             this.advance(move, protagonist.turnCodes, enemy.turnCodes, protagonist, enemy);
 //            System.out.println("-----------------------------");
-            if (getState().equals("active")) {
+            if (getState().equals("active")) {  /// maybe add and move != h i
                 move = enemy.generateBotMove();
                 this.processInput(move, enemy);
                 this.advance(move, protagonist.turnCodes, enemy.turnCodes, enemy, protagonist);
@@ -315,7 +315,7 @@ public class Game {
     void end(String n) {
 //        System.out.println("-------exit code " + n);
         System.out.println("Game over.\n");
-        if (n.equals("villian")) {
+        if (n.equals("enemy")) {
             System.out.println("You are victorious. ");
             protagonist.wins++;
             System.out.println("You have defeated " + protagonist.wins + " challengers.");
