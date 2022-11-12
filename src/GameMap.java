@@ -53,6 +53,7 @@ public class GameMap {
             }
         }
     }
+
     public void displayMap() {
         for (int row = 0; row < mapRow; row ++) {
             for (int col = 0 ; col < mapCol; col ++) {
@@ -63,7 +64,7 @@ public class GameMap {
         System.out.println();
     }
 
-    public String replaceChar(int i, String s, char c) {
+    public static String replaceChar(int i, String s, char c) {
         String newStr = "";
         for (int j = 0; j < 8; j ++) {
             if (j == i) {

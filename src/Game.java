@@ -9,7 +9,7 @@ public class Game {
     public static String poem;
     public static GameMap gameMap = new GameMap();
     public static Player protagonist = new Player("hero", false);
-    public static Player enemy = new Player("villian", true);
+    public static Player enemy = new Player("enemy", true);
     private static final Scanner in = new Scanner(System.in);
     public static String endName = "none";
 
@@ -41,13 +41,14 @@ public class Game {
             System.out.println(gameMap.mapReport(protagonist.positCol, protagonist.positRow));
             String move = getInput("Ponder your next move and press a key: ");
             this.processInput(move, protagonist);
+             this.advance(protagonist.turnCodes, enemy.turnCodes, protagonist, enemy);
             System.out.println("-----------------------------");
             if (getState().equals("active")) {
                 move = enemy.generateBotMove();
                 this.processInput(move, enemy);
             }
+             this.advance(protagonist.turnCodes, enemy.turnCodes, enemy, protagonist);
             System.out.println("-----------------------------");
-            this.advance(protagonist.turnCodes, enemy.turnCodes);
         }
         this.end(endName);
         this.reset();
@@ -143,7 +144,7 @@ public class Game {
                 p.turnCodes[0] = true;
                 break;
             case "A": // attack
-//                this.game.p.attack();
+                p.processAttack();
                 p.turnCodes[0] = true;
                 break;
             case "N":
@@ -165,10 +166,48 @@ public class Game {
         }
     }
 
-    public void advance(boolean[] pCodes, boolean[] eCodes) {
-        if (pCodes[0]) {  // I might need to check both, not sure yet
+    public void advance(boolean[] pCodes, boolean[] eCodes, Player pri, Player sec) {
+        int finalDamage = pri.damage;
+        // inc the turn num
+        if (pCodes[0]) {
             turnNum++;
         }
+        // calculate and apply damages
+        String magicStuff = " while wearing: \n";
+            if (pri.turnCodes[1]) {  // invis
+                finalDamage = 0;
+                magicStuff += "The Cloak of Invisibilty \n";
+            }
+            if (pri.turnCodes[2]) {  // strength
+                finalDamage += 2;
+                magicStuff += "The Gauntlet of Strength \n";
+            }
+            if (pri.turnCodes[3]) {  //  retoration
+                pri.health += 3;
+                if (pri.name.equals("hero")) {
+                    System.out.println("Ahhhhh! The tincture kicked in, increasing your health by 3.");
+                }
+            }
+            // shield handled below and in player class
+            if (pri.turnCodes[5]) {  // speed
+                finalDamage *= 2;
+                magicStuff += "The Crown of Speed \n";
+            }
+        finalDamage -= pri.shield;
+            sec.health -= finalDamage;
+            // messaging
+        String top;
+        String bottom;
+        if (pri.name.equals("hero")) {
+            top = "You";
+            bottom = "The enemy";
+        } else {
+            top = "The enemy";
+            bottom = "You";
+        }
+        System.out.println(top + " struck with " + pri.weapon + " inflicting " + finalDamage + "points, " + magicStuff);
+        System.out.println("Your health is " + protagonist.health + ".  The enemy's health is " + enemy.health);
+        // magic depletion
         if (protagonist.invisibility > 0) {
             protagonist.invisibility--;
             if (protagonist.invisibility == 0) {
@@ -202,6 +241,7 @@ public class Game {
         if (protagonist.protection > 0) {
             protagonist.protection--;
             if (protagonist.protection == 0) {
+                protagonist.shield -= 2;
                 pCodes[4] = false;
                 System.out.println("The aura that once enveloped you swirls away.  You feel naked without your magic shield.");
                 protagonist.magicItems[3] = null;
@@ -279,5 +319,9 @@ public class Game {
             check = checkReplay();
         }
         return check;
+    }
+
+    public static boolean nearEachOther() {
+        return (Math.abs(protagonist.positCol - enemy.positCol) <= 1) && (Math.abs(protagonist.positRow - enemy.positRow) <= 1);
     }
 }
