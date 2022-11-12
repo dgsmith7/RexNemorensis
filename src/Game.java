@@ -26,7 +26,7 @@ public class Game {
         this.backStory += "which you shall hold...as long as you live.  For you, a violent death is assured - the question is how soon.  How many battles will you survive if you can ";
         this.backStory += "take the guard?  You are armed with only your fists and a dagger, but there are other, more powerful weapons strewn about the mesa.  There are also ";
         this.backStory += "magical items, each with varying powers. Watch your step - you may fall to your death off the edge of the mesa or into a hole forevermore.  The other ";
-        this.backStory += "guard lurks in the grove, awaiting the challengers.\n";
+        this.backStory += "guard lurks in the grove, awaiting the challengers.  Your loin cloth flaps with the wind.  You blush.\n";
         poem = "       Those trees in whose dim shadow\n";
         poem += "       The ghastly priest doth reign\n";
         poem += "       The priest who slew the slayer,\n";
@@ -37,16 +37,16 @@ public class Game {
     public void run() {
         setState("active");
         showIntro();
-        while (getState().equals("active")) {
+         while (getState().equals("active")) {
             System.out.println(gameMap.mapReport(protagonist.positCol, protagonist.positRow));
             String move = getInput("Ponder your next move and press a key: ");
             this.processInput(move, protagonist);
-            this.advance(move, protagonist.turnCodes, enemy.turnCodes, protagonist, enemy);
+            if (!move.equals("Q")) this.advance(move, protagonist.turnCodes, enemy.turnCodes, protagonist, enemy);
 //            System.out.println("-----------------------------");
             if (getState().equals("active")) {  /// maybe add and move != h i
                 move = enemy.generateBotMove();
                 this.processInput(move, enemy);
-                this.advance(move, protagonist.turnCodes, enemy.turnCodes, enemy, protagonist);
+                if (!move.equals("Q")) this.advance(move, protagonist.turnCodes, enemy.turnCodes, enemy, protagonist);
  //               System.out.println("-----------------------------");
             }
         }
@@ -174,7 +174,7 @@ public class Game {
         // calculate and apply damages if an attack
         if (m.equals("A")) {
             int finalDamage = pri.damage;
-            String magicStuff = " while wearing a loin cloth and the following magic items: \n";
+            String magicStuff = " while using the following magic items: \n";
             if (pri.turnCodes[1]) {  // invis
                 finalDamage = 0;
                 magicStuff += "The Cloak of Invisibilty \n";
@@ -189,11 +189,18 @@ public class Game {
                 finalDamage *= 2;
                 magicStuff += "The Crown of Speed \n";
             }
-            if (magicStuff.equals(" while wearing a loin cloth and the following magic items: \n")) {
-                magicStuff += "none.";
+            if (magicStuff.equals(" while using the following magic items: \n")) {
+                if (pri.name.equals("hero")) {
+                    magicStuff += "The loin cloth of fortitude (always worn.)";
+                } else {
+                    magicStuff += "none.";
+                }
             }
             if (Game.nearEachOther()) {
-                finalDamage -= pri.shield;
+                finalDamage -= sec.shield;
+                if (finalDamage < 0) {
+                    finalDamage = 0;
+                }
                 sec.health -= finalDamage;
                 // messaging
                 String top;
@@ -210,10 +217,14 @@ public class Game {
             }
         }
         // check for death
-        if (sec.health <= 0) {
+        if (protagonist.health <= 0) {
+            endName = "hero";
             System.out.println("You hear the tolling of a death knell.");
             setState("game-over");
+        } else if (enemy.health <= 0) {
             endName = "enemy";
+            System.out.println("You hear the tolling of a death knell.");
+            setState("game-over");
         } else {
             // inc the turn num
             if (protagonist.turnCodes[0]) {
