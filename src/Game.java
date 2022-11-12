@@ -162,7 +162,7 @@ public class Game {
     }
 
     public boolean inputIsValid(String _input) {
-        if ("hiqHIQ12345gansweGANSWE".contains(_input)) {
+        if ("hiqHIQ12345gansweGANSWE".contains(_input) && !_input.equals("")) {
             return true;
         } else {
             System.out.println("That is not a valid move (press H for help).");
