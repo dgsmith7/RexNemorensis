@@ -1,4 +1,7 @@
+import java.util.Scanner;
+
 public class Player {
+    public Scanner in = new Scanner(System.in);
     public int gamesWon;
     public String name;
     public boolean bot;
@@ -15,6 +18,7 @@ public class Player {
     public int restoration;
     public int speed;
     public boolean[] turnCodes;
+    public int wins;
 
     Player(String _name, boolean _bot) {
 //        System.out.println("-------Constructing a player named " + _name + ".");
@@ -22,8 +26,8 @@ public class Player {
         this.name = _name;
         this.bot = _bot;
         if (_bot) {
-            this.positCol = GameMap.mapCol;
-            this.positRow = GameMap.mapRow;
+            this.positCol = GameMap.mapCol-1;
+            this.positRow = GameMap.mapRow-1;
         } else {
             this.positCol = 0;
             this.positRow = 0;
@@ -38,11 +42,12 @@ public class Player {
         this.protection = 0;
         this.restoration = 0;
         this.speed = 0;
-        this.turnCodes = new boolean[1];
+        this.turnCodes = new boolean[6];
+        this.wins = 0;
      }
 
     public void showStatus() {
-        System.out.println("Status:");
+        System.out.println("INVENTORY AND STATUS:");
         System.out.println("Your have " + this.health + " health points.");
         System.out.println("Your strongest weapon is a " + this.weapon + " - each hit removes " + this.attack + " health from your enemy.");
         System.out.println("Your shield (or lack thereof) provides " + this.shield + " protection from any attack.");
@@ -50,7 +55,7 @@ public class Player {
         boolean none = true;
         for (int i = 0; i < magicItems.length; i++) {
             if (magicItems[i] != null) {
-                System.out.println("   Press " + i + " to activate " + magicItems[i]);
+                System.out.println("   Press " + (i+1) + " to activate " + magicItems[i]);
                 none = false;
             }
         }
@@ -64,27 +69,68 @@ public class Player {
         if (this.speed > 0) System.out.println("   Crown of speed");
         int magicSum = this.invisibility + this.strength + this.restoration + this.protection + this.speed;
         if (magicSum == 0) System.out.println("   none");
+        Game.getReturn();
     }
 
     public void processMove(String s) {
-        System.out.println("-------The move was processed for " + name + ".");
-        System.out.println("You moved " + s);
-        if (s.equals("n")) {this.positRow--;}
-        if (s.equals("s")) {this.positRow++;}
-        if (s.equals("w")) {this.positCol--;}
-        if (s.equals("e")) {this.positCol++;}
+//        System.out.println("-------The move is being processed for " + name + ".");
+        System.out.print("-------" + name + " moving ");
+        if (s.equals("N")) {
+            if (Game.gameMap.notWall(this.positCol, this.positRow-1)) {
+                this.positRow--;
+                System.out.println("North");
+            } else {
+                System.out.println("but something blocks your path.");
+            }
+        }
+        if (s.equals("S")) {
+            if (Game.gameMap.notWall(this.positCol, this.positRow+1)) {
+                this.positRow++;
+                System.out.println("South");
+            } else {
+            System.out.println("but something blocks your path.");
+            }
+        }
+        if (s.equals("W")) {
+            if (Game.gameMap.notWall(this.positCol-1, this.positRow)) {
+                this.positCol--;
+                System.out.println("West");
+            } else {
+                System.out.println("but something blocks your path.");
+            }
+        }
+        if (s.equals("E")) {
+            if (Game.gameMap.notWall(this.positCol+1, this.positRow)) {
+                this.positCol++;
+                System.out.println("East");
+            } else {
+                System.out.println("but something blocks your path.");
+            }
+        }
+        System.out.println(name + " is now on " + this.positCol + " - " + this.positRow);
         // if you're off the edge fall
         if (this.positRow < 0 || this.positRow > 7 || this.positCol < 0 || this.positCol > 7) {
-            System.out.println("You fell to your death, you clumsy fool!\n");
-            RexNemorensis.game.setState("game-over");
-            RexNemorensis.game.end();
+             if (name.equals("hero")) {
+                System.out.println("You fell to your death, you clumsy fool!\n");
+            } else {
+                System.out.println("The enemy fell to their death.  Clumsy fool!\n");
+            }
+            Game.setState("game-over");
+            Game.endName = name;
+        } else {
+            // if your on a hole fall
+            if (GameMap.layout[this.positRow].charAt(this.positCol) == 'H') {
+                if (name.equals("hero")) {
+                    System.out.println("You fell a great distance down a hot, smelly hole and died a horrible, hot, smelly death!\n");
+                } else {
+                    System.out.println("You hear the enemy scream as they fall to their hot, smelly death down a hot, smelly hole!\n");
+                }
+                Game.setState("game-over");
+                Game.endName = name;
+            }
         }
-        // if your on a hole fall
-        if (GameMap.layout[this.positRow].charAt(this.positCol) == 'H') {
-            System.out.println("You fell a great distance down a hot, smelly hole and died a horrible, hot, smelly death!\n");
-            RexNemorensis.game.setState("game-over");
-            RexNemorensis.game.end();
-        }
+
+
         System.out.println();
     }
 
@@ -128,23 +174,33 @@ public class Player {
         System.out.println("Invoking the magic of " + s);
         switch(s) {
             case "1": if (invisibility == 0 ) {
-                    invisibility = 3;
+                invisibility = 3;
+                turnCodes[1] = true;
+                System.out.println("You slide the cloak over your shoulders and suddenly disappear (too bad 'cuz your coiffure looks great today). You are safe from attack for now.");
                 }
                 break;
             case "2": if (strength == 0 ) {
                 strength = 3;
+                turnCodes[2] = true;
+                System.out.println("The gauntlet fits your hand like a........uhhh - gauntlet, and you feel strong enough to pull the ears of a Gundark.");
             }
                 break;
             case "3": if (restoration == 0 ) {
                 restoration = 3;
+                turnCodes[3] = true;
+                System.out.println("You drink deeply. This is better than the immuno-boost at Jamba Juice. You health increases.");
             }
                 break;
             case "4": if (protection == 0 ) {
                 protection = 3;
+                turnCodes[4] = true;
+                System.out.println("The ring slides easily onto your hand and you are surrounded by a strange protective aura.");
             }
                 break;
             case "5": if (speed == 0 ) {
                 speed = 3;
+                turnCodes[5] = true;
+                System.out.println("As you carefully place the crown atop your head, careful not to mess up your elaborate hairdo, you noticed it is adorned with jeweled wings.  Your hands seem twice as fast as before.");
             }
                 break;
         }
@@ -226,8 +282,21 @@ public class Player {
 //        return newDam;
 //    }
 
-    public void generateBotMove() {
-        System.out.println("-------The move was generated for " + name + ".");
+    public String generateBotMove() {
+//        System.out.println("-------The move was generated for " + name + ".");
+        return "N";
+        /*
+        pick a genreral dir gd
+
+        if item, get
+        if enemy if h < 5 escape
+                 if h > 5 and < 15 50-50 if magic magic-attack else attack
+                 if h > 15 attack
+        else move gd if wall new gd
+                     if hole 25 new gd no wall
+
+*/
+//        return "E";
     }
 
     public int getPositCol() {

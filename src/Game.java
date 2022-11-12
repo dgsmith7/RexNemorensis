@@ -5,122 +5,153 @@ public class Game {
     private static String gameState;
     private String title;
     private String backStory;
+    private final String continueStory;
+    public static String poem;
     public static GameMap gameMap = new GameMap();
     public static Player protagonist = new Player("hero", false);
     public static Player enemy = new Player("villian", true);
-    private final Scanner in;
+    private static final Scanner in = new Scanner(System.in);
+    public static String endName = "none";
 
     Game() {
-        System.out.println("-------Constructing the Game.");
-        this.in = new Scanner(System.in);
+//        System.out.println("-------Constructing the Game.");
 //        this.turnNum = 1;
-        this.setState("init");
+        setState("init");
         this.title = "\n======================\n";
         this.title += "=   Rex Nemorensis   =\n";
         this.title += "======================\n";
-        this.backStory = "You are a mage and warrior.  For your mettle, you have been honored to serve a priesthood for the Godess Diana.  In this role, your final role, you\n";
-        this.backStory += "have been cast atop the windswept cliffs of The Grove at Nemi.  In this place there are ruins and holes and cliff edges.  Here you are relegated to\n";
-        this.backStory += "stand an endless guard until you are killed by another exiled sole.  Another like you currently stands guard awaiting your challenge to usurp their reign\n";
-        this.backStory += "which you shall hold...as long as you live.  For you, a violent death is assured - the question is how soon.  How many battles will you survive if you can\n";
-        this.backStory += "take the guard?  You are armed with only your fists and a dagger, but there are other, more powerful weapons strewn about the mesa.  There are also \n";
-        this.backStory += "magical items, each with varying powers. Watch your step - you may fall to your death off the edge of the mesa or into a hole forevermore.  The other\n";
-        this.backStory += "guard lurks in the grove, awaiting the challengers.\n\n";
-        this.backStory += "       Those trees in whose dim shadow\n";
-        this.backStory += "       The ghastly priest doth reign\n";
-        this.backStory += "       The priest who slew the slayer,\n";
-        this.backStory += "       And shall himself be slain.    -McCaulay\n";
-     }
+        this.backStory = "You are a mage and warrior.  For your mettle, you have been honored to serve a priesthood for the Godess Diana.  In this role, your final role, you ";
+        this.backStory += "have been cast atop the windswept cliffs of The Grove at Nemi.  In this place there are ruins and holes and cliff edges.  Here you are relegated to ";
+        this.backStory += "stand an endless guard until you are killed by another exiled sole.  Another like you currently stands guard awaiting your challenge to usurp their reign ";
+        this.backStory += "which you shall hold...as long as you live.  For you, a violent death is assured - the question is how soon.  How many battles will you survive if you can ";
+        this.backStory += "take the guard?  You are armed with only your fists and a dagger, but there are other, more powerful weapons strewn about the mesa.  There are also ";
+        this.backStory += "magical items, each with varying powers. Watch your step - you may fall to your death off the edge of the mesa or into a hole forevermore.  The other ";
+        this.backStory += "guard lurks in the grove, awaiting the challengers.\n";
+        poem = "       Those trees in whose dim shadow\n";
+        poem += "       The ghastly priest doth reign\n";
+        poem += "       The priest who slew the slayer,\n";
+        poem += "       And shall himself be slain.    -McCaulay\n";
+        this.continueStory = "You reign continues.  A new challenger has entered the grove.\n";
+    }
 
     public void run() {
-        this.gameState = "active";
+       setState("active");
         showIntro();
-        showHelpReport();
-        protagonist.showStatus();
-        while (this.getState().equals("active")) {
+         while (getState().equals("active")) {
             System.out.println(gameMap.mapReport(protagonist.positCol, protagonist.positRow));
-            String move = getInput();
-            this.processInput(move);
-            protagonist.processMove(move);
-            enemy.processMove(move);
+            String move = getInput("Ponder your next move and press a key: ");
+            this.processInput(move, protagonist);
+            System.out.println("-----------------------------");
+            if (getState().equals("active")) {
+                move = enemy.generateBotMove();
+                this.processInput(move, enemy);
+            }
+            System.out.println("-----------------------------");
             this.advance(protagonist.turnCodes, enemy.turnCodes);
         }
-        this.end();
+        this.end(endName);
+        this.reset();
+    }
+
+    private void reset() {
+        setState("active");
+        System.out.println("-------Resetting");
     }
 
     public void showIntro() {
-        System.out.println(this.title);
-        System.out.println(this.backStory);
+
+        if (protagonist.wins == 0) {
+            System.out.println(this.title);
+            System.out.println(this.backStory);
+            System.out.println(poem);
+            showHelpReport();
+            protagonist.showStatus();
+        } else {
+            System.out.println();
+            System.out.println("-----------------------------");
+            System.out.println(this.continueStory);
+        }
     }
 
-    public String getState() {
+    public static String getState() {
         return gameState;
     }
 
-    public void setState (String s) {
+    public static void setState(String s) {
         gameState = s;
     }
+
     public void showHelpReport() {
-        String helpReport = "These do not cost a turn:               These moves cost one turn:\n";
-        helpReport += "H - Help                                N, S, E, W - move\n";
-        helpReport += "I - Inventory and status                1, 2, 3, 4, 5 - Use Magic Item\n";
-        helpReport += "Q - Quit                                A - Attack with strongest weapon\n";
-        helpReport += "                                        G - get item\n";
+        String helpReport = "-----------------------------HELP----------------------------------\n";
+        helpReport +=       "| These do not cost a turn:     These moves cost one turn:        |\n";
+        helpReport +=       "|  H - Help                      N, S, E, W - move                |\n";
+        helpReport +=       "|  I - Inventory and status      1, 2, 3, 4, 5 - Use Magic Item   |\n";
+        helpReport +=       "|  Q - Quit                      A - Attack with strongest weapon |\n";
+        helpReport +=       "|                                G - get item                     |\n";
+        helpReport +=       "-------------------------------------------------------------------\n";
         System.out.println(helpReport);
+        Game.getReturn();
     }
 
-    public String getInput() {
+    public String getInput(String prompt) {
         String newInput = "";
-        System.out.print("Ponder your next move and press a key: ");
+        System.out.print(prompt);
         newInput = in.nextLine();
         while (!inputIsValid(newInput)) {
-            newInput = getInput();
+            newInput = getInput(prompt);
         }
         return newInput.toUpperCase();
     }
 
-    public void processInput(String s) {
-        System.out.println("You pressed " + s);
+    public static void getReturn() {
+        String k = "";
+        System.out.println("Press enter to continue.\n");
+        k = in.nextLine();
+        while (!k.equals("")) {
+            k = in.nextLine();
+            getReturn();
+        }
+        System.out.println("-----------------------------");
+    }
+
+    public void processInput(String s, Player p) {
+//        System.out.println("-------You pressed " + s);
         switch (s) {
             case "H": // help
                 this.showHelpReport();
-                protagonist.turnCodes[0] = false;
+                p.turnCodes[0] = false;
                 break;
             case "I": // inventory
-                protagonist.showStatus();
-                protagonist.turnCodes[0] = false;
+                p.showStatus();
+                p.turnCodes[0] = false;
                 break;
             case "Q": // quit
-                this.gameState = "game-over";
-                protagonist.turnCodes[0] = false;
+                gameState = "game-over";
+                endName = "none";
+                p.turnCodes[0] = false;
                 break;
             case "1":// magic
             case "2":
             case "3":
             case "4":
             case "5":
-                  protagonist.processMagic(s);
-//                println(this.game.map.mapReport(this.game.protagonist.positCol, this.game.protagonist.positRow));
-                protagonist.turnCodes[0] = true;
+                p.processMagic(s);
+                p.turnCodes[0] = true;
                 break;
             case "G": // get
-                protagonist.getItem();
-//                println(this.game.map.mapReport(this.game.protagonist.positCol, this.game.protagonist.positRow));
-                protagonist.turnCodes[0] = true;
+                p.getItem();
+                p.turnCodes[0] = true;
                 break;
             case "A": // attack
-//                this.game.protagonist.attack();
-//                println(this.game.map.mapReport(this.game.protagonist.positCol, this.game.protagonist.positRow));
-                protagonist.turnCodes[0] = true;
+//                this.game.p.attack();
+                p.turnCodes[0] = true;
                 break;
             case "N":
             case "S":
             case "E":
             case "W": // move
-//                if (this.game.map.moveIsValid()) {
-//                    this.game.protagonist.move(key);
-//                    println(this.game.map.mapReport(this.game.protagonist.positCol, this.game.protagonist.positRow));
-//                }
-                protagonist.turnCodes[0] = true;
+                p.processMove(s);
+                p.turnCodes[0] = true;
                 break;
         }
     }
@@ -135,13 +166,118 @@ public class Game {
     }
 
     public void advance(boolean[] pCodes, boolean[] eCodes) {
-        if (pCodes[0] ) {  // I might need to check both, not sure yet
+        if (pCodes[0]) {  // I might need to check both, not sure yet
             turnNum++;
+        }
+        if (protagonist.invisibility > 0) {
+            protagonist.invisibility--;
+            if (protagonist.invisibility == 0) {
+                pCodes[1] = false;
+                System.out.println("You suddenly fade back into the realm of the visible as the cloak loses its power.");
+                protagonist.magicItems[0] = null;
+            } else {
+                System.out.println("You magic invisibility is wearing off.");
+            }
+        }
+        if (protagonist.strength > 0) {
+            protagonist.strength--;
+            if (protagonist.strength == 0) {
+                pCodes[2] = false;
+                System.out.println("You weapon feels heavier once again.");
+                protagonist.magicItems[1] = null;
+            } else {
+                System.out.println("You magic strength is wearing off.");
+            }
+        }
+        if (protagonist.restoration > 0) {
+            protagonist.restoration--;
+            if (protagonist.restoration == 0) {
+                pCodes[3] = false;
+                System.out.println("You look around for a place to nap and recharge as your magic health dissipates.");
+                protagonist.magicItems[2] = null;
+            } else {
+                System.out.println("You magic restoration is wearing off.");
+            }
+        }
+        if (protagonist.protection > 0) {
+            protagonist.protection--;
+            if (protagonist.protection == 0) {
+                pCodes[4] = false;
+                System.out.println("The aura that once enveloped you swirls away.  You feel naked without your magic shield.");
+                protagonist.magicItems[3] = null;
+            } else {
+                System.out.println("You magic protection is wearing off.");
+            }
+        }
+        if (protagonist.speed > 0) {
+            protagonist.speed--;
+            if (protagonist.speed == 0) {
+                pCodes[5] = false;
+                System.out.println("You take a practice swing of your weapon and it feels like its moving in slow motion as your magic speed wanes like the moon.");
+                protagonist.magicItems[4] = null;
+            } else {
+                System.out.println("You magic strength is wearing off.");
+            }
+        }
+        if (enemy.invisibility > 0) {
+            enemy.invisibility--;
+            if (enemy.invisibility == 0) {
+                eCodes[1] = false;
+                enemy.magicItems[0] = null;
+            }
+        }
+        if (enemy.strength > 0) {
+            enemy.strength--;
+            if (enemy.strength == 0) {
+                eCodes[2] = false;
+                enemy.magicItems[1] = null;
+            }
+        }
+        if (enemy.restoration > 0) {
+            enemy.restoration--;
+            if (enemy.restoration == 0) {
+                eCodes[3] = false;
+                enemy.magicItems[2] = null;
+            }
+        }
+        if (enemy.protection > 0) {
+            enemy.protection--;
+            if (enemy.protection == 0) {
+                eCodes[4] = false;
+                enemy.magicItems[3] = null;
+            }
+        }
+        if (enemy.speed > 0) {
+            enemy.speed--;
+            if (enemy.speed == 0) {
+                eCodes[5] = false;
+                enemy.magicItems[4] = null;
+            }
         }
     }
 
-    void end() {
+    void end(String n) {
+//        System.out.println("-------exit code " + n);
         System.out.println("Game over.\n");
-        System.exit(0);
+        if (n.equals("villian")) {
+            System.out.println("You are victorious. ");
+            protagonist.wins++;
+            System.out.println("You have defeated " + protagonist.wins + " challengers.");
+        } else if (n.equals("hero")) {
+            System.out.println("You are defeated. A haloed child touches your head. You hear their whisper from behind, 'All glory is fleeting...'");
+            RexNemorensis.replay = checkReplay().startsWith("Y");
+        } else {
+            RexNemorensis.replay = checkReplay().startsWith("Y");
+        }
+    }
+
+    public String checkReplay() {
+        String check = "";
+        System.out.print("Would you like to play again? ");
+        check = in.nextLine().toUpperCase();
+        while (!(check.startsWith("Y") || check.startsWith("N"))) {
+            check = checkReplay();
+        }
+        return check;
     }
 }

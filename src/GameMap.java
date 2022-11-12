@@ -8,7 +8,7 @@ public class GameMap {
     public static int mapRow;
 
     GameMap () {
-        System.out.println("-------Constructing the map.");
+//        System.out.println("-------Constructing the map.");
         // map dimensions follow
         mapCol = 8;
         mapRow = 8;
@@ -21,8 +21,10 @@ public class GameMap {
     public void generateLayout() {
         // adjust this.mapCol and mapRow appropriately
         // B - bare, W-wall, H-Hole
-        layout[0] = "BBBBBBBB";
-        layout[1] = "BWBBBBHB";
+        layout[0] = "12345ASD";  // for testing
+        layout[1] = "HWBBBBHB";  // for testing
+//        layout[0] = "BBBBBBBB";
+//        layout[1] = "BWBBBBHB";
         layout[2] = "BWWWWBBB";
         layout[3] = "BWBBWBBB";
         layout[4] = "BBBBWBWB";
@@ -73,11 +75,15 @@ public class GameMap {
         return newStr;
     }
 
-    public boolean noWall(int col, int row) {
-        if (layout[row].charAt(col) != 'W') {
+    public boolean notWall(int col, int row) {
+        if (col < 0 || row < 0 || col > GameMap.mapCol-1 || row > GameMap.mapRow-1) {
             return true;
         } else {
-            return false;
+            if (layout[row].charAt(col) != 'W') {
+                return true;
+            } else {
+                return false;
+            }
         }
     }
 
@@ -89,8 +95,8 @@ public class GameMap {
         char eChar = 'L';
         boolean signif = false;
         System.out.println();
-        System.out.println("You are on col " + col + " row " + row + ". The map code is " + layout[row].charAt(col));
-        System.out.println("Its turn number " + Game.turnNum);
+//        System.out.println("-------You are on col " + col + " row " + row + ". The map code is " + layout[row].charAt(col));
+        System.out.println("-------Its turn number " + Game.turnNum);
         // look in each direction for stuff
         if (col != 0) {
             wChar = layout[row].charAt(col-1);
@@ -106,29 +112,29 @@ public class GameMap {
         }
         // holes
         if (nChar == 'H' || sChar == 'H' || wChar == 'H' || eChar == 'H') {
-            report += "A foul, hot stench rises from a nearby hole in the ground.\n";
+            report += "A foul, hot stench rises from a nearby hole in the ground. ";
         }
         // walls
-        if (nChar == 'W') report += "A raven circle high above the wall of a ruin to the North.\n";
-        if (sChar == 'W') report += "You feel the cool moisture of a stone wall to your South.\n";
-        if (wChar == 'W') report += "A granite boulder to the West blocks out the light.\n";
-        if (eChar == 'W') report += "The east is impassable due to a barrier.\n";
+        if (nChar == 'W') report += "A raven circle high above the wall of a ruin to the North. ";
+        if (sChar == 'W') report += "You feel the cool moisture of a stone wall to your South. ";
+        if (wChar == 'W') report += "A granite boulder to the West blocks out the light. ";
+        if (eChar == 'W') report += "The east is impassable due to a barrier. ";
         // edges
         if (row == 0) {
-            report += "You feel your bile rising as you stand near the Northern precipice.\n";
+            report += "The view is great, but you feel your stomach tighten as you slip on some gravel near the Northern precipice. ";
         }
         if (row == 7) {
-            report += "Something deep below your guts begins to pucker because your are near the high Southern rim.\n";
+            report += "Something deep below your guts begins to pucker because your are near the high Southern rim. ";
         }
         if (col == 0) {
-            report += "Your head feels light and your vision grows dim near the Western cliff-edge of the grove.\n";
+            report += "Your head feels light and your vision grows dim near the Western cliff-edge of the grove. ";
         }
         if (col == 7) {
-            report += "Your knees tremble as you peer over the Eastern ledge.\n";
+            report += "Your knees tremble as you peer over the Eastern ledge at the gorgeous vista of Lake Nemi. ";
         }
         // magic items
         if (layout[row].charAt(col) == '1') {
-            report += "You see a scarlet cloak among a pile of bones here.\n";
+            report += "You see a scarlet cloak among a pile of bones here. ";
             signif = true;
         }
         if (layout[row].charAt(col) == '2') {
@@ -136,11 +142,11 @@ public class GameMap {
             signif = true;
         }
         if (layout[row].charAt(col) == '3') {
-            report += "There is a delicate clay bowl containg an irridescent liquid atop an altar.";
+            report += "There is a delicate clay bottle containing an iridescent liquid atop an altar.";
             signif = true;
         }
         if (layout[row].charAt(col) == '4') {
-            report += "A ring smelt of rare metal with an inscription lies at your feet";
+            report += "A ring with an inscription, smelt of rare metal, that is laying at your feet, begins to vibrate.";
             signif = true;
         }
         if (layout[row].charAt(col) == '5') {
@@ -149,24 +155,24 @@ public class GameMap {
         }
         // weapons
         if (layout[row].charAt(col) == 'A') {
-            report += "A heavy axe with a keen edge is stuck in a nearby stump.\n";
+            report += "A heavy axe with a keen edge is stuck in a nearby stump. ";
             signif = true;
         }
         if (layout[row].charAt(col) == 'S') {
-            report += "You hear a low hum coming from a well-crafted sword on the ground.\n";
+            report += "You hear a low hum coming from a well-crafted sword on the ground. ";
             signif = true;
         }
         if (layout[row].charAt(col) == 'D') {
-            report += "You see a sturdy shield propped on a rock.\n";
+            report += "You see a sturdy shield propped on a rock. ";
             signif = true;
         }
         // enemy
         if ((Math.abs(Game.protagonist.getPositCol() - Game.enemy.positCol) <= 1) && (Math.abs(Game.protagonist.positRow - Game.enemy.positRow) <= 1)) {
-            report += "Your adreneline surges as you sense the closeness of your enemy.\n";
+            report += "Your adreneline surges as you sense the closeness of your enemy. ";
             signif = true;
         }
         if (!signif) {
-            report += "There is nothing else to see here.\n";
+            report += "There is nothing else to see here. ";
         }
         return report;
     }
