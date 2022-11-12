@@ -295,6 +295,42 @@ public class Player {
         }
     }
 
+    public boolean edgeFall(String dir) {
+        return (this.positCol == 0 && (dir.equals("W")) ||
+                (this.positCol == GameMap.mapCol - 1 && dir.equals("E")) ||
+                (this.positRow == 0 && dir.equals("N")) ||
+                (this.positRow == GameMap.mapRow - 1 && dir.equals("S")));
+    }
+
+    public boolean edgeWall(String dir) {
+        /*
+        if you are not on east edge and (dir is e and the string is not W)
+        or if you are not on west edge and (dir is w and the string in not w)
+        or if you are not on the south edge and (dir is s and the string is not w)
+        or if you are not on the north edge and (dir is n and the string is not w)
+         */
+        return ((this.positCol != GameMap.mapCol - 1 && (dir.equals("E") && !String.valueOf(GameMap.layout[positRow].charAt(positCol + 1)).equals("W"))) ||
+                (this.positCol != 0 && (dir.equals("W") && !String.valueOf(GameMap.layout[positRow].charAt(positCol - 1)).equals("W"))) ||
+                (this.positRow != GameMap.mapRow - 1 && (dir.equals("S") && !String.valueOf(GameMap.layout[positRow + 1].charAt(positCol)).equals("W"))) ||
+                (this.positRow != 0 && (dir.equals("N") && !String.valueOf(GameMap.layout[positRow - 1].charAt(positCol)).equals("W"))));
+    }
+
+    public boolean nonEdgeWall (String dir) {
+        String n = String.valueOf(GameMap.layout[positRow - 1].charAt(positCol));
+        System.out.println("-------North is " + n);
+        String e = String.valueOf(GameMap.layout[positRow].charAt(positCol + 1));
+        System.out.println("-------East is " + e);
+        String s = String.valueOf(GameMap.layout[positRow + 1].charAt(positCol));
+        System.out.println("-------South is " + s);
+        String w = String.valueOf(GameMap.layout[positRow].charAt(positCol - 1));
+        System.out.println("-------West is " + w);
+        return !((n.equals("W") && dir.equals("N")) ||
+                (s.equals("W") && dir.equals("S")) ||
+                (e.equals("W") && dir.equals("E")) ||
+                (w.equals("W") && dir.equals("W")));
+
+    }
+
     public String generateBotMove() {
         /*
         get a dir
@@ -307,74 +343,99 @@ public class Player {
             else...not on an edge
                 check for a wall - if wall mark unsafe
          */
-
         System.out.println("-------calculating a bot move from " + positRow + " " + positCol);
         String dir = "N";
         dir = getRandomDir(dir);
         boolean safe = false;
         while (!safe) {
-            boolean fall = false;
+            safe = true;  // assume its a good direction unless proven otherwise below
             dir = getRandomDir(dir);
-            if (positCol == 0 || positCol == (GameMap.mapCol - 1) || positRow == 0 || (positRow == GameMap.mapRow - 1)) {// if on a cliff
+            if (positCol == 0 || positCol == (GameMap.mapCol - 1) || positRow == 0 || (positRow == GameMap.mapRow - 1)) {// on a cliff edge
                 System.out.println("-------Enemy on a ledge");
-                float probSure = (float) (Math.random() * 10) + 1;  // determine if I should check if Im near a ledge
+                float probSure = (float) (Math.random() * 10);  // determine if I should check if Im near a ledge
                 System.out.println("-------Fall index is " + probSure);
-                if (probSure < 9.8) { // only check near edge 98% of the time so maybe a fall
-                    if (this.positCol == 0 && !dir.equals("W")) {
-                        safe = true;
-                    }  if (this.positCol == GameMap.mapCol - 1 && !dir.equals("E")) {
-                        safe = true;
-                    } if (this.positRow == 0 && !dir.equals("N")) {
-                        safe = true;
-                    } if (this.positRow == GameMap.mapRow - 1 && !dir.equals("S")) {
-                        safe = true;
-                    } System.out.println("-------After prob check, move " + dir + " safety is " + safe);
-//                    if (fall) System.out.println("-------Enemy gonna fall.");
+                if (probSure < 9.8) {// check for a fall 98 % of the time
+                    safe = (!edgeFall(dir));
                 }
-                if (this.positCol == 0 && dir.equals("W")) {
-                    fall = true;
-                }
-                if (this.positCol == GameMap.mapCol - 1 && dir.equals("E")) {
-                    fall = true;
-                }
-                if (this.positRow == 0 && dir.equals("N")) {
-                    fall = true;
-                }
-                if (this.positRow == GameMap.mapRow - 1 && dir.equals("S")) {
-                    fall = true;
-                }
-                if (!fall) {
-                    if (this.positCol != GameMap.mapCol - 1 && dir.equals("E") && !String.valueOf(GameMap.layout[positRow].charAt(positCol + 1)).equals("W")) {
-                        safe = true;
-                    }
-                    if (this.positCol != 0 && dir.equals("W") && !String.valueOf(GameMap.layout[positRow].charAt(positCol - 1)).equals("W")) {
-                        safe = true;
-                    }
-                    if (this.positRow != GameMap.mapRow - 1 && dir.equals("S") && !String.valueOf(GameMap.layout[positRow + 1].charAt(positCol)).equals("W")) {
-                        safe = true;
-                    }
-                    if (this.positRow != 0 && !dir.equals("N") && !String.valueOf(GameMap.layout[positRow - 1].charAt(positCol)).equals("W")) {
-                        safe = true;
-                    }
-                    System.out.println("-------After edge wall check, move " + dir + " safety is " + safe);
-                }
-            } else {  //  check to see there is no barrier
-                System.out.println("-------Should not be on an edge now " + positCol + " " + positRow);
-                String n = String.valueOf(GameMap.layout[positRow - 1].charAt(positCol));
-                System.out.println("-------North is " + n);
-                String e = String.valueOf(GameMap.layout[positRow].charAt(positCol + 1));
-                System.out.println("-------East is " + e);
-                String s = String.valueOf(GameMap.layout[positRow + 1].charAt(positCol));
-                System.out.println("-------South is " + s);
-                String w = String.valueOf(GameMap.layout[positRow].charAt(positCol - 1));
-                System.out.println("-------West is " + w);
-                if (n.equals("W") && !dir.equals("N")) safe = true;
-                if (s.equals("W") && !dir.equals("S")) safe = true;
-                if (e.equals("W") && !dir.equals("E")) safe = true;
-                if (w.equals("W") && !dir.equals("W")) safe = true;
+                System.out.println("-------After prob check, move " + dir + " safety is " + safe);
+                safe = safe || edgeWall(dir);
+                System.out.println("-------After edge wall check, move " + dir + " safety is " + safe);
+            } else { // not on an edge
+                System.out.println("-------Enemy on a ledge");
+                safe = nonEdgeWall(dir);
                 System.out.println("-------After non-edge wall check, move " + dir + " safety is " + safe);
             }
         }
+
+
+        ///////////////
+//        System.out.println("-------calculating a bot move from " + positRow + " " + positCol);
+//        String dir = "N";
+//        dir = getRandomDir(dir);
+//        boolean safe = false;
+//        while (!safe) {
+//            boolean fall = false;
+//            dir = getRandomDir(dir);
+//            if (positCol == 0 || positCol == (GameMap.mapCol - 1) || positRow == 0 || (positRow == GameMap.mapRow - 1)) {// if on a cliff
+//                System.out.println("-------Enemy on a ledge");
+//                float probSure = (float) (Math.random() * 10) + 1;  // determine if I should check if Im near a ledge
+//                System.out.println("-------Fall index is " + probSure);
+//                if (probSure < 9.8) { // only check near edge 98% of the time so maybe a fall
+//                    if (this.positCol == 0 && !dir.equals("W")) {
+//                        safe = true;
+//                    }  if (this.positCol == GameMap.mapCol - 1 && !dir.equals("E")) {
+//                        safe = true;
+//                    } if (this.positRow == 0 && !dir.equals("N")) {
+//                        safe = true;
+//                    } if (this.positRow == GameMap.mapRow - 1 && !dir.equals("S")) {
+//                        safe = true;
+//                    } System.out.println("-------After prob check, move " + dir + " safety is " + safe);
+////                    if (fall) System.out.println("-------Enemy gonna fall.");
+//                }
+//                if (this.positCol == 0 && dir.equals("W")) {
+//                    fall = true;
+//                }
+//                if (this.positCol == GameMap.mapCol - 1 && dir.equals("E")) {
+//                    fall = true;
+//                }
+//                if (this.positRow == 0 && dir.equals("N")) {
+//                    fall = true;
+//                }
+//                if (this.positRow == GameMap.mapRow - 1 && dir.equals("S")) {
+//                    fall = true;
+//                }
+//                if (!fall) {
+//                    if (this.positCol != GameMap.mapCol - 1 && dir.equals("E") && !String.valueOf(GameMap.layout[positRow].charAt(positCol + 1)).equals("W")) {
+//                        safe = true;
+//                    }
+//                    if (this.positCol != 0 && dir.equals("W") && !String.valueOf(GameMap.layout[positRow].charAt(positCol - 1)).equals("W")) {
+//                        safe = true;
+//                    }
+//                    if (this.positRow != GameMap.mapRow - 1 && dir.equals("S") && !String.valueOf(GameMap.layout[positRow + 1].charAt(positCol)).equals("W")) {
+//                        safe = true;
+//                    }
+//                    if (this.positRow != 0 && !dir.equals("N") && !String.valueOf(GameMap.layout[positRow - 1].charAt(positCol)).equals("W")) {
+//                        safe = true;
+//                    }
+//                    System.out.println("-------After edge wall check, move " + dir + " safety is " + safe);
+//                }
+//            } else {  //  check to see there is no barrier
+//                System.out.println("-------Should not be on an edge now " + positCol + " " + positRow);
+//                String n = String.valueOf(GameMap.layout[positRow - 1].charAt(positCol));
+//                System.out.println("-------North is " + n);
+//                String e = String.valueOf(GameMap.layout[positRow].charAt(positCol + 1));
+//                System.out.println("-------East is " + e);
+//                String s = String.valueOf(GameMap.layout[positRow + 1].charAt(positCol));
+//                System.out.println("-------South is " + s);
+//                String w = String.valueOf(GameMap.layout[positRow].charAt(positCol - 1));
+//                System.out.println("-------West is " + w);
+//                if (n.equals("W") && !dir.equals("N")) safe = true;
+//                if (s.equals("W") && !dir.equals("S")) safe = true;
+//                if (e.equals("W") && !dir.equals("E")) safe = true;
+//                if (w.equals("W") && !dir.equals("W")) safe = true;
+//                System.out.println("-------After non-edge wall check, move " + dir + " safety is " + safe);
+//            }
+//        }
         if (Game.nearEachOther()) {  // if enemy in strike distance
             if (this.health >= 50) { // attack if health above 50
                 System.out.println("-------done calculating. A > 50");
