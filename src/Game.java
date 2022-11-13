@@ -134,7 +134,7 @@ public class Game {
         System.out.print("Press ENTER to continue.\n");
         k = in.nextLine();
         while (!k.equals("")) {
-            k="";
+            k = "";
             getReturn();
         }
         System.out.println("---------------------");
