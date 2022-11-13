@@ -81,7 +81,7 @@ public class GameMap {
     public void mapReport(int col, int row) {  // report on map status - happens each turn
         String report = "You are located on coordinate " + Game.protagonist.positRow + " - " + Game.protagonist.positCol + "\n";
         if (Game.enemy.invisibility == 0) {
-            report += "Your spot your enemy on coordinate " + Game.enemy.positRow + " - " + Game.enemy.positCol + "\n";
+            report += "You spot your enemy on coordinate " + Game.enemy.positRow + " - " + Game.enemy.positCol + "\n";
         } else {
             report += "The enemy is invisible at the moment.  Sneaky!\n";
         }

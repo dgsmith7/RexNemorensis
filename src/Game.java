@@ -18,9 +18,9 @@ public class Game {
         this.title = "\n======================\n";
         this.title += "=   Rex Nemorensis   =\n";
         this.title += "======================\n";
-        this.backStory = "You are a mage and warrior.  For your mettle, you have been honored to serve a priesthood for the Godess Diana.  In this role, your final role, you ";
+        this.backStory = "You are a mage and warrior.  For your mettle, you have been honored to serve a priesthood for the Goddess Diana.  In this role, your final role, you ";
         this.backStory += "have been cast atop the windswept cliffs of The Grove at Nemi.  In this place there are ruins and holes and cliff edges.  Here you are relegated to ";
-        this.backStory += "stand an endless guard until you are killed by another exiled sole.  Another like you currently stands guard awaiting your challenge to usurp their reign ";
+        this.backStory += "stand an endless guard until you are killed by another exiled soul.  Another like you currently stands guard awaiting your challenge to usurp their reign ";
         this.backStory += "which you shall hold...as long as you live.  For you, a violent death is assured - the question is how soon.  How many battles will you survive if you can ";
         this.backStory += "take the guard?  You are armed with only your fists and a dagger, but there are other, more powerful weapons strewn about the mesa.  There are also ";
         this.backStory += "magical items, each with varying powers. Watch your step - you may fall to your death off the edge of the mesa or into a hole forevermore.  The other ";
