@@ -249,23 +249,23 @@ public class Player {
         boolean noItem = false;
         switch (GameMap.layout[this.positRow].charAt(this.positCol)) {
             case '1':
-                item = "Cloak of invisibility: Incoming attack 0 damage for 3 turns when used.";
+                item = "Cloak of invisibility: Incoming attack 0 damage for 3 turns when used.  Press '1' to use.";
                 this.magicItems[0] = item;
                 break;
             case '2':
-                item = "Gauntlet of strength: Attack force +5 for 3 turns when used.";
+                item = "Gauntlet of strength: Attack force +5 for 3 turns when used.  Press '2' to use.";
                 this.magicItems[1] = item;
                 break;
             case '3':
-                item = "Tincture of restoration: Health +5 for 3 turns when used.";
+                item = "Tincture of restoration: Health +5 for 3 turns when used.  Press '3' to use.";
                 this.magicItems[2] = item;
                 break;
             case '4':
-                item = "Ring of protection: Shield +5 for 3 turns when used.";
+                item = "Ring of protection: Shield +5 for 3 turns when used.  Press '4' to use.";
                 this.magicItems[3] = item;
                 break;
             case '5':
-                item = "Crown of speed: 2x attack for three turns when used.";
+                item = "Crown of speed: 2x attack for three turns when used.  Press '5' to use.";
                 this.magicItems[4] = item;
                 break;
             case 'A':
@@ -274,14 +274,17 @@ public class Player {
                 this.attack = 20;
                 break;
             case 'S':
-                if (!weapon.equals("axe")) {
+                if (weapon.equals("sword") && name.equals("hero")) {  // hero already has one
+                    System.out.println("You already have a sword, Greed-o.");
+                } else if (!weapon.equals("axe")) {  // enemy or hero does not have one
                     item = "sword. Direct hits will henceforth inflict 15 damage.";
                     this.weapon = "sword";
                     this.attack = 15;
-                } else {
+                } else {  // hero already has a better weapon
                     noItem = true;
-                    if (name.equals("hero"))
-                        System.out.println("You decide to forgo the sword for the superior axe in hand.");
+                    if (name.equals("hero")) {
+                            System.out.println("You decide to forgo the sword for the superior axe in hand.");
+                        }
                     turnCodes[0] = false;
                 }
                 break;

@@ -79,9 +79,9 @@ public class GameMap {
     }
 
     public void mapReport(int col, int row) {  // report on map status - happens each turn
-        String report = "You are located on coordinate " + Game.protagonist.positRow + " - " + Game.protagonist.positCol + "\n";
+        String report = "You are located in a grove on a mesa on row " + Game.protagonist.positRow + " - column " + Game.protagonist.positCol + "\n";
         if (Game.enemy.invisibility == 0) {
-            report += "You spot your enemy on coordinate " + Game.enemy.positRow + " - " + Game.enemy.positCol + "\n";
+            report += "You spot your enemy on row " + Game.enemy.positRow + " - column " + Game.enemy.positCol + "\n";
         } else {
             report += "The enemy is invisible at the moment.  Sneaky!\n";
         }
@@ -159,6 +159,7 @@ public class GameMap {
             report += "You see a sturdy shield propped on a rock.\n";
             signif = true;
         }
+        if (signif) report += "Press 'g' to get this item.\n";
         // enemy
         if ((Math.abs(Game.protagonist.positCol - Game.enemy.positCol) <= 1) && (Math.abs(Game.protagonist.positRow - Game.enemy.positRow) <= 1)) {
             report += "Your adreneline surges as you sense the closeness of your enemy.\n";

@@ -18,12 +18,12 @@ public class Game {
         this.title = "\n======================\n";
         this.title += "=   Rex Nemorensis   =\n";
         this.title += "======================\n";
-        this.backStory = "You are a mage and warrior.  For your mettle, you have been honored to serve a priesthood for the Goddess Diana.  In this role, your final role, you ";
-        this.backStory += "have been cast atop the windswept cliffs of The Grove at Nemi.  In this place there are ruins and holes and cliff edges.  Here you are relegated to ";
-        this.backStory += "stand an endless guard until you are killed by another exiled soul.  Another like you currently stands guard awaiting your challenge to usurp their reign ";
-        this.backStory += "which you shall hold...as long as you live.  For you, a violent death is assured - the question is how soon.  How many battles will you survive if you can ";
-        this.backStory += "take the guard?  You are armed with only your fists and a dagger, but there are other, more powerful weapons strewn about the mesa.  There are also ";
-        this.backStory += "magical items, each with varying powers. Watch your step - you may fall to your death off the edge of the mesa or into a hole forevermore.  The other ";
+        this.backStory = "You are a mage and warrior.  For your mettle, you have been honored to serve a priesthood for the Goddess Diana.  In this role, your final role, you\n";
+        this.backStory += "have been cast atop the windswept cliffs of The Grove at Nemi.  In this place there are ruins and holes and cliff edges.  Here you are relegated to\n";
+        this.backStory += "stand an endless guard until you are killed by another exiled soul.  Another like you currently stands guard awaiting your challenge to usurp their reign\n";
+        this.backStory += "which you shall hold...as long as you live.  For you, a violent death is assured - the question is how soon.  How many battles will you survive if you can\n";
+        this.backStory += "take the guard?  You are armed with only your fists and a dagger, but there are other, more powerful weapons strewn about the mesa.  There are also\n";
+        this.backStory += "magical items, each with varying powers. Watch your step - you may fall to your death off the edge of the mesa or into a hole forevermore.  The other\n";
         this.backStory += "guard lurks in the grove, awaiting the challengers.\n";
         poem = "       Those trees in whose dim shadow\n";
         poem += "       The ghastly priest doth reign\n";
@@ -79,6 +79,8 @@ public class Game {
         System.out.println("The more newly exiled souls you slaughter, the stronger they get, eh?\n");
         System.out.println("Enemy health: " + enemy.health);
         System.out.println("Enemy shield: " + enemy.shield);
+        System.out.println();
+        getReturn();
     }
 
     public void showIntro() {
@@ -89,8 +91,6 @@ public class Game {
             showHelpReport();
             protagonist.showStatus();
         } else {
-            System.out.println();
-            System.out.println("-----------------------------");
             System.out.println(this.continueStory);
             protagonist.showStatus();
         }
@@ -106,6 +106,7 @@ public class Game {
 
     public void showHelpReport() {
         String helpReport = "-----------------------------HELP----------------------------------\n";
+        helpReport += "| Rows run from 0 West to 7 East, Columns 0 North to 7 South      |\n";
         helpReport += "| These do not cost a turn:     These moves cost one turn:        |\n";
         helpReport += "|  H - Help                      N, S, E, W - move                |\n";
         helpReport += "|  I - Inventory and status      1, 2, 3, 4, 5 - Use Magic Item   |\n";
@@ -123,6 +124,7 @@ public class Game {
         while (!inputIsValid(newInput)) {
             newInput = getInput(prompt);
         }
+        System.out.println("---------------------");
         System.out.println();
         return newInput.toUpperCase();
     }
@@ -132,8 +134,10 @@ public class Game {
         System.out.print("Press ENTER to continue.\n");
         k = in.nextLine();
         while (!k.equals("")) {
+            k="";
             getReturn();
         }
+        System.out.println("---------------------");
     }
 
     public void processInput(String s, Player p) {  // process the player input and prep for processing turn
@@ -364,6 +368,7 @@ public class Game {
             protagonist.wins++;
             System.out.println("You have defeated " + protagonist.wins + " challengers.");
             System.out.println();
+            getReturn();
             return 0;
         } else if (n.equals("hero")) {
             System.out.println("You are defeated. A haloed child touches your head. You hear their whisper from behind, 'All glory is fleeting...'");
