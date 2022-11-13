@@ -15,7 +15,7 @@ public class RexNemorensis {
 /*
 TODO
 Comments
-Magic items messaging and efficacy - all five
+
 Add a probability - "you dropped youre weapon, buttefingers" when on an edge.
 Draw the map really nicely once at the beginning
 Draw an ascii image at the beginning

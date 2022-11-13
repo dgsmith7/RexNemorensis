@@ -77,6 +77,9 @@ public class Player {
         int magicSum = this.invisibility + this.strength + this.restoration + this.protection + this.speed;
         if (magicSum == 0) System.out.println("   none");
         System.out.println("You have defeated " + wins + " challengers.");
+        if (Math.random() < 0.5) {
+            System.out.println("Your loin cloth flaps with the wind.  You blush.");
+        }
         System.out.println();
         Game.getReturn();
     }
@@ -86,38 +89,38 @@ public class Player {
         if (name.equals("hero")) {
             System.out.print("You are moving ");
         } else {
-            System.out.print("The enemy is moving ");
+            if (Game.enemy.invisibility == 0) System.out.print("The enemy is moving ");
         }
         if (s.equals("N")) {
             if (Game.gameMap.notWall(this.positCol, this.positRow - 1)) {
                 this.positRow--;
-                System.out.println("North.");
+                if (Game.enemy.invisibility == 0 || name.equals("hero")) System.out.println("North.");
             } else {
-                System.out.println("but something blocks the path.");
+                if (Game.enemy.invisibility == 0 || name.equals("hero"))System.out.println("but something blocks the path.");
             }
         }
         if (s.equals("S")) {
             if (Game.gameMap.notWall(this.positCol, this.positRow + 1)) {
                 this.positRow++;
-                System.out.println("South.");
+                if (Game.enemy.invisibility == 0 || name.equals("hero"))System.out.println("South.");
             } else {
-                System.out.println("but something blocks the path.");
+                if (Game.enemy.invisibility == 0 || name.equals("hero"))System.out.println("but something blocks the path.");
             }
         }
         if (s.equals("W")) {
             if (Game.gameMap.notWall(this.positCol - 1, this.positRow)) {
                 this.positCol--;
-                System.out.println("West.");
+                if (Game.enemy.invisibility == 0 || name.equals("hero"))System.out.println("West.");
             } else {
-                System.out.println("but something blocks the path.");
+                if (Game.enemy.invisibility == 0 || name.equals("hero"))System.out.println("but something blocks the path.");
             }
         }
         if (s.equals("E")) {
             if (Game.gameMap.notWall(this.positCol + 1, this.positRow)) {
                 this.positCol++;
-                System.out.println("East.");
+                if (Game.enemy.invisibility == 0 || name.equals("hero"))System.out.println("East.");
             } else {
-                System.out.println("but something blocks the path.");
+                if (Game.enemy.invisibility == 0 || name.equals("hero"))System.out.println("but something blocks the path.");
             }
         }
 //        System.out.println("-------" + name + " is now on " + this.positCol + " - " + this.positRow);
@@ -179,7 +182,7 @@ public class Player {
         switch (s) {
             case "1":
                 if (this.invisibility == 0 && this.magicItems[0] != null) {
-                    this.invisibility = 3;
+                    this.invisibility = 4;
                     this.turnCodes[1] = true;
                     if (this.name.equals("hero")) {
                         System.out.println("You slide the cloak over your shoulders and suddenly disappear (too bad 'cuz your coiffure looks great today). You are safe from attack for now.");
@@ -190,7 +193,7 @@ public class Player {
                 break;
             case "2":
                 if (this.strength == 0 && this.magicItems[1] != null) {
-                    this.strength = 3;
+                    this.strength = 4;
                     this.turnCodes[2] = true;
                     if (this.name.equals("hero")) {
                         System.out.println("The gauntlet fits your hand like a.....uhhh - gauntlet, and you feel strong enough to pull the ears of a Gundark.");
@@ -201,8 +204,7 @@ public class Player {
                 break;
             case "3":
                 if (this.restoration == 0 && this.magicItems[2] != null) {
-                    this.restoration = 3;
-                    //this.health += 3;
+                    this.restoration = 4;
                     this.turnCodes[3] = true;
                     if (this.name.equals("hero")) {
                         System.out.println("You drink deeply. This is better than the immuno-boost at Jamba Juice. You health begins to build.");
@@ -213,8 +215,8 @@ public class Player {
                 break;
             case "4":
                 if (this.protection == 0 && this.magicItems[3] != null) {
-                    this.protection = 3;
-                    this.shield += 2;
+                    this.protection = 4;
+                    this.shield += 5;
                     this.turnCodes[4] = true;
                     if (this.name.equals("hero")) {
                         System.out.println("The ring slides easily onto your hand and you are surrounded by a strange protective aura.");
@@ -225,10 +227,10 @@ public class Player {
                 break;
             case "5":
                 if (this.speed == 0 && this.magicItems[4] != null) {
-                    this.speed = 3;
+                    this.speed = 4;
                     this.turnCodes[5] = true;
                     if (this.name.equals("hero")) {
-                        System.out.println("As you carefully place the crown atop your head, careful not to mess up your elaborate hairdo, you noticed it is adorned with jeweled wings.  Your hands seem twice as fast as before.");
+                        System.out.println("As you carefully place the crown atop your head, careful not to mess up your elaborate hairdo, you noticed it is adorned with jeweled wings.  Your hands seem twice as fast as before.  Hmmmmm, you ponder, I wonder if I could attack twice in the same amount of time it takes to attack once.");
                     }
                 } else {
                     System.out.println("Negative, Ghost-rider, the pattern is full.  You don't own that item.");
@@ -254,7 +256,7 @@ public class Player {
                 this.magicItems[2] = item;
                 break;
             case '4':
-                item = "Ring of protection: Shield +2 for 3 turns when used.";
+                item = "Ring of protection: Shield +5 for 3 turns when used.";
                 this.magicItems[3] = item;
                 break;
             case '5':
@@ -273,13 +275,13 @@ public class Player {
                     this.attack = 15;
                 } else {
                     noItem = true;
-                    if (name.equals("hero")) System.out.println("You decide to forgo the word for the superior axe in hand.");
+                    if (name.equals("hero")) System.out.println("You decide to forgo the sword for the superior axe in hand.");
                     turnCodes[0] = false;
                 }
                 break;
             case 'D':
-                item = "shield. All hits from enemies will henceforth be reduced by 3 damage.";
-                this.shield = 3;
+                item = "shield. All hits from enemies will henceforth be reduced by 5 damage.";
+                this.shield = 5;
                 break;
             default:
                 System.out.println("There is nothing to get here.");

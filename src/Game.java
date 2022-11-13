@@ -26,7 +26,7 @@ public class Game {
         this.backStory += "which you shall hold...as long as you live.  For you, a violent death is assured - the question is how soon.  How many battles will you survive if you can ";
         this.backStory += "take the guard?  You are armed with only your fists and a dagger, but there are other, more powerful weapons strewn about the mesa.  There are also ";
         this.backStory += "magical items, each with varying powers. Watch your step - you may fall to your death off the edge of the mesa or into a hole forevermore.  The other ";
-        this.backStory += "guard lurks in the grove, awaiting the challengers.  Your loin cloth flaps with the wind.  You blush.\n";
+        this.backStory += "guard lurks in the grove, awaiting the challengers.\n";
         poem = "       Those trees in whose dim shadow\n";
         poem += "       The ghastly priest doth reign\n";
         poem += "       The priest who slew the slayer,\n";
@@ -58,6 +58,16 @@ public class Game {
         setState("active");
 //        System.out.println("-------Resetting");
         // actually write the rest code here soon
+        /*
+        move enemy 77
+        move protag 00 add narrative  hooch  almost feel sorry for them  every fighter gets their ass kicked one day
+        enemy health and shield 100+ (tied to protag wins)
+        enemy inventory empty
+        enemy attack to default
+        new map?
+        turncodes zeroed
+        enemy magics 0
+         */
     }
 
     public void showIntro() {
@@ -175,23 +185,31 @@ public class Game {
         if (m.equals("A")) {
             int finalDamage = pri.damage;
             String magicStuff = " while using the following magic items: \n";
-            if (pri.turnCodes[1]) {  // invis
+            if (pri.turnCodes[1]) {  // invis pri
+                magicStuff += "The Cloak of Invisibilty (" + pri.invisibility + ") turns remaining.\n";
+            }
+            if (sec.turnCodes[1]) {  // invis sec
                 finalDamage = 0;
-                magicStuff += "The Cloak of Invisibilty \n";
             }
             if (pri.turnCodes[2]) {  // strength
-                finalDamage += 2;
-                magicStuff += "The Gauntlet of Strength \n";
+                finalDamage += 5;
+                magicStuff += "The Gauntlet of Strength (" + pri.strength + ") turns remaining.\n";
             }
-            // restoration handled below and in player class
-            // shield handled below and in player class
+            if (pri.turnCodes[3]) {  // restoration
+                magicStuff += "The Tincture of Restoration (" + pri.restoration + ") turns remaining.\n";
+                // restoration handled below and in player class
+            }
+            if (pri.turnCodes[4]) {  // protection
+                magicStuff += "The Ring of Protection (" + pri.protection + ") turns remaining.\n";
+                // shield handled below and in player class
+            }
             if (pri.turnCodes[5]) {  // speed
                 finalDamage *= 2;
-                magicStuff += "The Crown of Speed \n";
+                magicStuff += "The Crown of Speed (" + pri.speed + ") turns remaining.\n";
             }
             if (magicStuff.equals(" while using the following magic items: \n")) {
                 if (pri.name.equals("hero")) {
-                    magicStuff += "The loin cloth of fortitude (always worn.)";
+                    magicStuff += "The loin cloth of fortitude (always on - well, almost always).";
                 } else {
                     magicStuff += "none.";
                 }
@@ -213,7 +231,7 @@ public class Game {
                     bottom = "You";
                 }
                 System.out.println(top + " struck with the " + pri.weapon + " inflicting " + finalDamage + " points damage, " + magicStuff);
-                System.out.println("Your health is " + protagonist.health + ".  The enemy's health is " + enemy.health);
+                System.out.println("Your health is " + protagonist.health + ".  The enemy's health is " + enemy.health + "\n");
             }
         }
         // check for death
@@ -231,94 +249,104 @@ public class Game {
                 turnNum++;
                 protagonist.turnCodes[0] = false;
                 // magic depletion
-                if (protagonist.invisibility > 0) {
-                    protagonist.invisibility--;
-                    if (protagonist.invisibility == 0) {
-                        protagonist.turnCodes[1] = false;
-                        System.out.println("You suddenly fade back into the realm of the visible as the cloak loses its power.");
-                        protagonist.magicItems[0] = null;
-                    } else {
-                        System.out.println("You magic invisibility is wearing off.");
-                    }
+                if (pri.name.equals("hero")) {
+                    depleteProtagMagic();
+                } else {
+                    depleteEnemyMagic();
                 }
-                if (protagonist.strength > 0) {
-                    protagonist.strength--;
-                    if (protagonist.strength == 0) {
-                        protagonist.turnCodes[2] = false;
-                        System.out.println("You weapon feels heavier once again.");
-                        protagonist.magicItems[1] = null;
-                    } else {
-                        System.out.println("You magic strength is wearing off.");
-                    }
-                }
-                if (protagonist.restoration > 0) {
-                    protagonist.restoration--;
-                    protagonist.health += 3;
-                    System.out.println("Ahhhhh! The tincture kicked in, increasing your health is now " + protagonist.health);
-                    if (protagonist.restoration == 0) {
-                        protagonist.turnCodes[3] = false;
-                        System.out.println("You look around for a place to nap and recharge as your magic health dissipates.");
-                        protagonist.magicItems[2] = null;
-                    } else {
-                        System.out.println("You magic restoration is wearing off.");
-                    }
-                }
-                if (protagonist.protection > 0) {
-                    protagonist.protection--;
-                    if (protagonist.protection == 0) {
-                        protagonist.shield -= 2;
-                        protagonist.turnCodes[4] = false;
-                        System.out.println("The aura that once enveloped you swirls away.  You feel naked without your magic shield.");
-                        protagonist.magicItems[3] = null;
-                    } else {
-                        System.out.println("You magic protection is wearing off.");
-                    }
-                }
-                if (protagonist.speed > 0) {
-                    protagonist.speed--;
-                    if (protagonist.speed == 0) {
-                        protagonist.turnCodes[5] = false;
-                        System.out.println("You take a practice swing of your weapon and it feels like its moving in slow motion as your magic speed wanes like the moon.");
-                        protagonist.magicItems[4] = null;
-                    } else {
-                        System.out.println("You magic strength is wearing off.");
-                    }
-                }
-                if (enemy.invisibility > 0) {
-                    enemy.invisibility--;
-                    if (enemy.invisibility == 0) {
-                        enemy.turnCodes[1] = false;
-                        enemy.magicItems[0] = null;
-                    }
-                }
-                if (enemy.strength > 0) {
-                    enemy.strength--;
-                    if (enemy.strength == 0) {
-                        enemy.turnCodes[2] = false;
-                        enemy.magicItems[1] = null;
-                    }
-                }
-                if (enemy.restoration > 0) {
-                    enemy.restoration--;
-                    if (enemy.restoration == 0) {
-                        enemy.turnCodes[3] = false;
-                        enemy.magicItems[2] = null;
-                    }
-                }
-                if (enemy.protection > 0) {
-                    enemy.protection--;
-                    if (enemy.protection == 0) {
-                        enemy.turnCodes[4] = false;
-                        enemy.magicItems[3] = null;
-                    }
-                }
-                if (enemy.speed > 0) {
-                    enemy.speed--;
-                    if (enemy.speed == 0) {
-                        enemy.turnCodes[5] = false;
-                        enemy.magicItems[4] = null;
-                    }
-                }
+            }
+        }
+    }
+
+    void depleteProtagMagic() {
+        if (protagonist.invisibility > 0) {
+            protagonist.invisibility--;
+            if (protagonist.invisibility == 0) {
+                protagonist.turnCodes[1] = false;
+                System.out.println("You suddenly fade back into the realm of the visible as the cloak loses its power.");
+                protagonist.magicItems[0] = null;
+            } else {
+                System.out.println("You magic invisibility will be gone in " + protagonist.invisibility + " turns.");
+            }
+        }
+        if (protagonist.strength > 0) {
+            protagonist.strength--;
+            if (protagonist.strength == 0) {
+                protagonist.turnCodes[2] = false;
+                System.out.println("You weapon feels heavier once again.");
+                protagonist.magicItems[1] = null;
+            } else {
+                System.out.println("You magic strength will be gone in " + protagonist.strength + " turns.");
+            }
+        }
+        if (protagonist.restoration > 0) {
+            protagonist.restoration--;
+            protagonist.health += 5;
+            System.out.println("Ahhhhh! The tincture kicked in, increasing your health is now " + protagonist.health);
+            if (protagonist.restoration == 0) {
+                protagonist.turnCodes[3] = false;
+                System.out.println("You look around for a place to nap and recharge as your magic health dissipates.");
+                protagonist.magicItems[2] = null;
+            } else {
+                System.out.println("You magic restoration will be gone in " + protagonist.restoration + " turns.");
+            }
+        }
+        if (protagonist.protection > 0) {
+            protagonist.protection--;
+            if (protagonist.protection == 0) {
+                protagonist.shield -= 5;
+                protagonist.turnCodes[4] = false;
+                System.out.println("The aura that once enveloped you swirls away.  You feel nearly naked without your magic shield.");
+                protagonist.magicItems[3] = null;
+            } else {
+                System.out.println("You magic protection will be gone in " + protagonist.protection + " turns.");
+            }
+        }
+        if (protagonist.speed > 0) {
+            protagonist.speed--;
+            if (protagonist.speed == 0) {
+                protagonist.turnCodes[5] = false;
+                System.out.println("You take a practice swing of your weapon and it feels like its moving in slow motion as your magic speed wanes like the moon.");
+                protagonist.magicItems[4] = null;
+            } else {
+                System.out.println("You magic speed will be gone in " + protagonist.speed + " turns.");
+            }
+        }    }
+
+    void depleteEnemyMagic() {
+        if (enemy.invisibility > 0) {
+            enemy.invisibility--;
+            if (enemy.invisibility == 0) {
+                enemy.turnCodes[1] = false;
+                enemy.magicItems[0] = null;
+            }
+        }
+        if (enemy.strength > 0) {
+            enemy.strength--;
+            if (enemy.strength == 0) {
+                enemy.turnCodes[2] = false;
+                enemy.magicItems[1] = null;
+            }
+        }
+        if (enemy.restoration > 0) {
+            enemy.restoration--;
+            if (enemy.restoration == 0) {
+                enemy.turnCodes[3] = false;
+                enemy.magicItems[2] = null;
+            }
+        }
+        if (enemy.protection > 0) {
+            enemy.protection--;
+            if (enemy.protection == 0) {
+                enemy.turnCodes[4] = false;
+                enemy.magicItems[3] = null;
+            }
+        }
+        if (enemy.speed > 0) {
+            enemy.speed--;
+            if (enemy.speed == 0) {
+                enemy.turnCodes[5] = false;
+                enemy.magicItems[4] = null;
             }
         }
     }
