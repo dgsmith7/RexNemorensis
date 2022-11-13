@@ -1,17 +1,11 @@
 public class GameMap {
-/* TODO
-    make a much larger map with more stuff
- */
-
     public static String[] layout;
     public static int mapCol;
     public static int mapRow;
 
-    GameMap () {
-//        System.out.println("-------Constructing the map.");
-        // map dimensions follow
-        mapCol = 8;
-        mapRow = 8;
+    GameMap() {
+        mapCol = 8; // map dimensions
+        mapRow = 8; // map dimensions
         layout = new String[mapRow];
         this.generateLayout();
         this.locateWeaponsAndMagicItems();
@@ -19,8 +13,8 @@ public class GameMap {
     }
 
     public void generateLayout() {
-        // adjust this.mapCol and mapRow appropriately
-        // B - bare, W-wall, H-Hole
+        // if you make a bigger map, adjust mapCol and mapRow above appropriately
+        // map codes for initial build: B - bare, W-wall, H-Hole
 //        layout[0] = "12345ASD";  // for testing
 //        layout[1] = "HWBBBBHB";  // for testing
         layout[0] = "BBBBBBBB";
@@ -34,29 +28,29 @@ public class GameMap {
     }
 
     public void locateWeaponsAndMagicItems() {
-        // A - axe, S - sword, D - shield, 12345 - magical item
-        for (int i = 0; i < 6; i ++) {
-            int col = (int)(Math.random() * mapCol);
-            int row = (int)(Math.random() * mapRow);
-            while (layout[row].charAt(col) != 'B') {
-                col = (int)(Math.random() * mapCol);
-                row = (int)(Math.random() * mapRow);
+        // map codes for item pass: A - axe, S - sword, D - shield, 12345 - magical items
+        for (int i = 0; i < 6; i++) { // add 6 items
+            int col = (int) (Math.random() * mapCol);
+            int row = (int) (Math.random() * mapRow);
+            while (layout[row].charAt(col) != 'B') {  //  find a bare spot on map - no hole, no wall, no items
+                col = (int) (Math.random() * mapCol);
+                row = (int) (Math.random() * mapRow);
             }
             if (i == 0) { // axe
                 layout[row] = replaceChar(col, layout[row], 'A');
-            } else if (i <= 2) {
+            } else if (i <= 2) {  // 2 swords
                 layout[row] = replaceChar(col, layout[row], 'S');
-            } else if (i == 3) {
+            } else if (i == 3) {  // shield
                 layout[row] = replaceChar(col, layout[row], 'D');
-            } else {
-                layout[row] = replaceChar(col, layout[row], String.valueOf(Math.floor(Math.random()  * 5 + 1)).charAt(0));
+            } else { // 2 random magic items
+                layout[row] = replaceChar(col, layout[row], String.valueOf(Math.floor(Math.random() * 5 + 1)).charAt(0));
             }
         }
     }
 
-    public void displayMap() {
-        for (int row = 0; row < mapRow; row ++) {
-            for (int col = 0 ; col < mapCol; col ++) {
+    public void displayMap() {  //  draws the map - happens unannounced only at start - kind of an easter egg
+        for (int row = 0; row < mapRow; row++) {
+            for (int col = 0; col < mapCol; col++) {
                 System.out.print(layout[row].charAt(col) + " ");
             }
             System.out.println();
@@ -64,9 +58,9 @@ public class GameMap {
         System.out.println();
     }
 
-    public static String replaceChar(int i, String s, char c) {
+    public static String replaceChar(int i, String s, char c) {  // utility used when doing weapons pass on build
         String newStr = "";
-        for (int j = 0; j < 8; j ++) {
+        for (int j = 0; j < 8; j++) {
             if (j == i) {
                 newStr += c;
             } else {
@@ -76,19 +70,15 @@ public class GameMap {
         return newStr;
     }
 
-    public boolean notWall(int col, int row) {
-        if (col < 0 || row < 0 || col > GameMap.mapCol-1 || row > GameMap.mapRow-1) {
+    public boolean notWall(int col, int row) {  // check to make sure there is no wall at passed cords
+        if (col < 0 || row < 0 || col > GameMap.mapCol - 1 || row > GameMap.mapRow - 1) { // no wall, but ledge
             return true;
         } else {
-            if (layout[row].charAt(col) != 'W') {
-                return true;
-            } else {
-                return false;
-            }
+            return layout[row].charAt(col) != 'W';
         }
     }
 
-    public void mapReport(int col, int row) {
+    public void mapReport(int col, int row) {  // report on map status - happens each turn
         String report = "You are located on coordinate " + Game.protagonist.positRow + " - " + Game.protagonist.positCol + "\n";
         if (Game.enemy.invisibility == 0) {
             report += "Your spot your enemy on coordinate " + Game.enemy.positRow + " - " + Game.enemy.positCol + "\n";
@@ -100,21 +90,18 @@ public class GameMap {
         char wChar = 'L';
         char eChar = 'L';
         boolean signif = false;
-//        System.out.println();
-//        System.out.println("-------You are on col " + col + " row " + row + ". The map code is " + layout[row].charAt(col));
-//        System.out.println("-------Its turn number " + Game.turnNum);
-        // look in each direction for stuff
+        // look in each direction for reportable info
         if (col != 0) {
-            wChar = layout[row].charAt(col-1);
+            wChar = layout[row].charAt(col - 1);
         }
         if (col != 7) {
-            eChar = layout[row].charAt(col+1);
+            eChar = layout[row].charAt(col + 1);
         }
         if (row != 0) {
-            nChar = layout[row-1].charAt(col);
+            nChar = layout[row - 1].charAt(col);
         }
         if (row != 7) {
-            sChar = layout[row+1].charAt(col);
+            sChar = layout[row + 1].charAt(col);
         }
         // holes
         if (nChar == 'H' || sChar == 'H' || wChar == 'H' || eChar == 'H') {
@@ -173,7 +160,7 @@ public class GameMap {
             signif = true;
         }
         // enemy
-        if ((Math.abs(Game.protagonist.getPositCol() - Game.enemy.positCol) <= 1) && (Math.abs(Game.protagonist.positRow - Game.enemy.positRow) <= 1)) {
+        if ((Math.abs(Game.protagonist.positCol - Game.enemy.positCol) <= 1) && (Math.abs(Game.protagonist.positRow - Game.enemy.positRow) <= 1)) {
             report += "Your adreneline surges as you sense the closeness of your enemy.\n";
             signif = true;
         }

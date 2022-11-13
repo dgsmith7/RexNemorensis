@@ -2,7 +2,7 @@ import java.util.Scanner;
 
 public class Game {
     public static int turnNum = 1;
-    private static String gameState;
+    private static String gameState;  // used in game loop below
     private String title;
     private String backStory;
     private final String continueStory;
@@ -35,36 +35,35 @@ public class Game {
     public void run() {
         setState("active");
         showIntro();
-         while (getState().equals("active")) {
+        while (getState().equals("active")) {  // repeat until game ends
             gameMap.mapReport(protagonist.positCol, protagonist.positRow);
             String move = getInput("Ponder your next move and press a key: ");
             this.processInput(move, protagonist);
-            if (!("QIH".contains(move))) this.advance(move, protagonist.turnCodes, enemy.turnCodes, protagonist, enemy);
-//            System.out.println("-----------------------------");
-            if (getState().equals("active") && (!"QIH".contains(move))) {
+            if (!("QIH".contains(move)))
+                this.advance(move, protagonist.turnCodes, enemy.turnCodes, protagonist, enemy);  // QIH - quit inventory health - no turn counter
+            if (getState().equals("active") && (!"QIH".contains(move))) {  // If QIH, the turn skips, so dont process enemy move
                 move = enemy.generateBotMove();
                 this.processInput(move, enemy);
                 this.advance(move, protagonist.turnCodes, enemy.turnCodes, enemy, protagonist);
- //               System.out.println("-----------------------------");
             }
+        } // game state has changed from active to get below this comment
+        int exitCode = this.end(endName);  // get exit code and replay desires
+        switch (exitCode) {
+            case 0:  // enemy lost keep protagonist but reset enemy
+                this.reset();
+                break;
+            case 1:  // player lost but wants to play again
+                gameMap = new GameMap();
+                protagonist = new Player("hero", false);
+                enemy = new Player("enemy", true);
+                break;
+            default: // player quit or enemy died and no replay desired
+                System.out.println("\nYou defeated " + Game.protagonist.wins + " challengers.");
+                break;
         }
-        int exitCode = this.end(endName);
-         switch(exitCode) {
-             case 0:
-                 this.reset();
-                 break;
-             case 1:
-                 gameMap = new GameMap();
-                 protagonist = new Player("hero", false);
-                 enemy = new Player("enemy", true);
-                 break;
-             default :
-                 System.out.println("\nYou defeated " + Game.protagonist.wins + " challengers.");
-                 break;
-         }
     }
 
-    private void reset() {
+    private void reset() {  // reset only what is needed if enemy is killed
         setState("active");
         protagonist.positRow = 0;
         protagonist.positCol = 0;
@@ -75,12 +74,12 @@ public class Game {
         System.out.println("You almost feel sorry for them, then you remember that poem.\n");
         System.out.println(Game.poem);
         enemy = new Player("enemy", true);
-        enemy.health += (5 * protagonist.wins);
-        enemy.shield += protagonist.wins;
+        enemy.health += (5 * protagonist.wins);  // plussed up enemy health the more you win
+        enemy.shield += protagonist.wins;  // plussed up enemy shield the more you win
         System.out.println("The more newly exiled souls you slaughter, the stronger they get, eh?\n");
         System.out.println("Enemy health: " + enemy.health);
         System.out.println("Enemy shield: " + enemy.shield);
-   }
+    }
 
     public void showIntro() {
         if (protagonist.wins == 0) {
@@ -117,7 +116,7 @@ public class Game {
         Game.getReturn();
     }
 
-    public String getInput(String prompt) {
+    public String getInput(String prompt) {  // get and validate next move
         String newInput = "";
         System.out.print(prompt);
         newInput = in.nextLine();
@@ -128,7 +127,7 @@ public class Game {
         return newInput.toUpperCase();
     }
 
-    public static void getReturn() {
+    public static void getReturn() {  // get a return key only
         String k = "";
         System.out.print("Press ENTER to continue.\n");
         k = in.nextLine();
@@ -137,7 +136,7 @@ public class Game {
         }
     }
 
-    public void processInput(String s, Player p) {
+    public void processInput(String s, Player p) {  // process the player input and prep for processing turn
 //        System.out.println("-------You pressed " + s);
         switch (s) {
             case "H": // help
@@ -183,7 +182,7 @@ public class Game {
         }
     }
 
-    public boolean inputIsValid(String _input) {
+    public boolean inputIsValid(String _input) {  // make sure input is a valid move
         if ("hiqHIQ12345gansweGANSWE".contains(_input) && !_input.equals("")) {
             return true;
         } else {
@@ -192,11 +191,10 @@ public class Game {
         }
     }
 
-    public void advance(String m, boolean[] pCodes, boolean[] eCodes, Player pri, Player sec) {
-        // calculate and apply damages if an attack
-        if (m.equals("A")) {
+    public void advance(String m, boolean[] pCodes, boolean[] eCodes, Player pri, Player sec) {  // process the full turn
+        if (m.equals("A")) {  // calculate and apply damages if an attack
             int finalDamage = pri.damage;
-            String magicStuff = " while using the following magic items: \n";
+            String magicStuff = " while using the following magic items: \n";  // adjust damage for magic
             if (pri.turnCodes[1]) {  // invis pri
                 magicStuff += "The Cloak of Invisibilty (" + pri.invisibility + ") turns remaining.\n";
             }
@@ -226,12 +224,12 @@ public class Game {
                     magicStuff += "none.";
                 }
             }
-            if (Game.nearEachOther()) {
-                finalDamage -= sec.shield;
-                if (finalDamage < 0) {
+            if (Game.nearEachOther()) {  // if player are within strike range of one another calculate and apply damage
+                finalDamage -= sec.shield;  // adjust for receiver shield
+                if (finalDamage < 0) {  // constrain so we aren't adding points back on attacks
                     finalDamage = 0;
                 }
-                sec.health -= finalDamage;
+                sec.health -= finalDamage;  // apply the damage
                 // messaging
                 String top;
                 String bottom;
@@ -247,15 +245,15 @@ public class Game {
             }
         }
         // check for death
-        if (protagonist.health <= 0) {
-            endName = "hero";
+        if (protagonist.health <= 0) {  // hero died
+            endName = "hero"; // mechanism for control flow at end-game
             System.out.println("You hear the tolling of a death knell.");
             setState("game-over");
-        } else if (enemy.health <= 0) {
-            endName = "enemy";
+        } else if (enemy.health <= 0) {  // enemy died
+            endName = "enemy";// mechanism for control flow at end-game
             System.out.println("You hear the tolling of a death knell.");
             setState("game-over");
-        } else {
+        } else {  // nobody died
             // inc the turn num
             if (protagonist.turnCodes[0]) {
                 turnNum++;
@@ -270,7 +268,7 @@ public class Game {
         }
     }
 
-    void depleteProtagMagic() {
+    void depleteProtagMagic() {  // adjust magic items for protagonist and display messages
         if (protagonist.invisibility > 0) {
             protagonist.invisibility--;
             if (protagonist.invisibility == 0) {
@@ -323,48 +321,43 @@ public class Game {
             } else {
                 System.out.println("You magic speed will be gone in " + protagonist.speed + " turns.");
             }
-        }    }
+        }
+    }
 
-    void depleteEnemyMagic() {
+    void depleteEnemyMagic() {  // deplete enemy magic items
         if (enemy.invisibility > 0) {
             enemy.invisibility--;
             if (enemy.invisibility == 0) {
                 enemy.turnCodes[1] = false;
-//                enemy.magicItems[0] = null;
             }
         }
         if (enemy.strength > 0) {
             enemy.strength--;
             if (enemy.strength == 0) {
                 enemy.turnCodes[2] = false;
-//                enemy.magicItems[1] = null;
             }
         }
         if (enemy.restoration > 0) {
             enemy.restoration--;
             if (enemy.restoration == 0) {
                 enemy.turnCodes[3] = false;
-//                enemy.magicItems[2] = null;
             }
         }
         if (enemy.protection > 0) {
             enemy.protection--;
             if (enemy.protection == 0) {
                 enemy.turnCodes[4] = false;
-//                enemy.magicItems[3] = null;
             }
         }
         if (enemy.speed > 0) {
             enemy.speed--;
             if (enemy.speed == 0) {
                 enemy.turnCodes[5] = false;
-//                enemy.magicItems[4] = null;
             }
         }
     }
 
-    public int end(String n) {
-//        System.out.println("-------exit code " + n);
+    public int end(String n) {  // messaging and prep for restarting game loop and main loop
         System.out.println("Game over.\n");
         if (n.equals("enemy")) {
             System.out.println("You are victorious. ");
@@ -383,7 +376,7 @@ public class Game {
         }
     }
 
-    public String checkReplay() {
+    public String checkReplay() {  // get user preference on replay
         String check = "";
         System.out.print("Would you like to play again? ");
         check = in.nextLine().toUpperCase();
@@ -393,7 +386,7 @@ public class Game {
         return check;
     }
 
-    public static boolean nearEachOther() {
+    public static boolean nearEachOther() {  // are the enemy close enough to attack
         return (Math.abs(protagonist.positCol - enemy.positCol) <= 1) && (Math.abs(protagonist.positRow - enemy.positRow) <= 1);
     }
 }

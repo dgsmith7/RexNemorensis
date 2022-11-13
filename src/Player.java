@@ -1,12 +1,7 @@
-import java.net.SocketOption;
 import java.util.Scanner;
-import java.util.function.DoubleToIntFunction;
-
-import static java.lang.Integer.valueOf;
 
 public class Player {
     public Scanner in = new Scanner(System.in);
-    public int gamesWon;
     public String name;
     public boolean bot;
     public int positCol;
@@ -25,15 +20,13 @@ public class Player {
     public int wins;
     public int damage;
 
-    Player(String _name, boolean _bot) {
-//        System.out.println("-------Constructing a player named " + _name + ".");
-        this.gamesWon = 0;
+    Player(String _name, boolean _bot) {  // constructor with identifiers
         this.name = _name;
         this.bot = _bot;
-        if (_bot) {
+        if (_bot) {  // enemy in lower right (SE)
             this.positCol = GameMap.mapCol - 1;
             this.positRow = GameMap.mapRow - 1;
-        } else {
+        } else {  // hero in upper left (NW)
             this.positCol = 0;
             this.positRow = 0;
         }
@@ -48,12 +41,11 @@ public class Player {
         this.protection = 0;
         this.restoration = 0;
         this.speed = 0;
-        this.turnCodes = new boolean[6];
-        // 0-incTurn 1-invis 2-strength 3-restore 4-protect 5-speed
+        this.turnCodes = new boolean[6];  // 0-incTurn 1-invis 2-strength 3-restore 4-protect 5-speed
         this.wins = 0;
     }
 
-    public void showStatus() {
+    public void showStatus() {  // report on inventory and status
         System.out.println("INVENTORY AND STATUS:");
         System.out.println("Your have " + this.health + " health points.");
         System.out.println("Your strongest weapon is a " + this.weapon + " - each direct hit removes " + this.attack + " health from your enemy.");
@@ -68,7 +60,6 @@ public class Player {
         }
         if (none) System.out.println("   none");
         System.out.println("Active magic Items:");
-        // figure out index nums for activation here
         if (this.invisibility > 0) System.out.println("   Cloak of invisibility");
         if (this.strength > 0) System.out.println("   Gauntlet of strength");
         if (this.restoration > 0) System.out.println("   Tincture of restoration");
@@ -84,8 +75,7 @@ public class Player {
         Game.getReturn();
     }
 
-    public void processMove(String s) {
-//        System.out.println("-------The move is being processed for " + name + ".");
+    public void processMove(String s) { // act on instruction entered or generated
         if (name.equals("hero")) {
             System.out.print("You are moving ");
         } else {
@@ -96,35 +86,38 @@ public class Player {
                 this.positRow--;
                 if (Game.enemy.invisibility == 0 || name.equals("hero")) System.out.println("North.");
             } else {
-                if (Game.enemy.invisibility == 0 || name.equals("hero"))System.out.println("but something blocks the path.");
+                if (Game.enemy.invisibility == 0 || name.equals("hero"))
+                    System.out.println("but something blocks the path.");
             }
         }
         if (s.equals("S")) {
             if (Game.gameMap.notWall(this.positCol, this.positRow + 1)) {
                 this.positRow++;
-                if (Game.enemy.invisibility == 0 || name.equals("hero"))System.out.println("South.");
+                if (Game.enemy.invisibility == 0 || name.equals("hero")) System.out.println("South.");
             } else {
-                if (Game.enemy.invisibility == 0 || name.equals("hero"))System.out.println("but something blocks the path.");
+                if (Game.enemy.invisibility == 0 || name.equals("hero"))
+                    System.out.println("but something blocks the path.");
             }
         }
         if (s.equals("W")) {
             if (Game.gameMap.notWall(this.positCol - 1, this.positRow)) {
                 this.positCol--;
-                if (Game.enemy.invisibility == 0 || name.equals("hero"))System.out.println("West.");
+                if (Game.enemy.invisibility == 0 || name.equals("hero")) System.out.println("West.");
             } else {
-                if (Game.enemy.invisibility == 0 || name.equals("hero"))System.out.println("but something blocks the path.");
+                if (Game.enemy.invisibility == 0 || name.equals("hero"))
+                    System.out.println("but something blocks the path.");
             }
         }
         if (s.equals("E")) {
             if (Game.gameMap.notWall(this.positCol + 1, this.positRow)) {
                 this.positCol++;
-                if (Game.enemy.invisibility == 0 || name.equals("hero"))System.out.println("East.");
+                if (Game.enemy.invisibility == 0 || name.equals("hero")) System.out.println("East.");
             } else {
-                if (Game.enemy.invisibility == 0 || name.equals("hero"))System.out.println("but something blocks the path.");
+                if (Game.enemy.invisibility == 0 || name.equals("hero"))
+                    System.out.println("but something blocks the path.");
             }
         }
-//        System.out.println("-------" + name + " is now on " + this.positCol + " - " + this.positRow);
-        // if you're off the edge fall
+        // if you're off the edge, fall
         if (this.positRow < 0 || this.positRow > 7 || this.positCol < 0 || this.positCol > 7) {
             if (name.equals("hero")) {
                 System.out.println("You fell to your death, you clumsy fool!\n");
@@ -134,7 +127,7 @@ public class Player {
             Game.setState("game-over");
             Game.endName = name;
         } else {
-            // if your on a hole fall
+            // if your on a hole, fall
             if (GameMap.layout[this.positRow].charAt(this.positCol) == 'H') {
                 if (name.equals("hero")) {
                     System.out.println("You fell a great distance down a hot, smelly hole and died a horrible, hot, smelly death!\n");
@@ -148,27 +141,24 @@ public class Player {
         System.out.println();
     }
 
-    public void processAttack() {
-        // process the attack
-        //System.out.println("-------Attacking.");
-        String damStr = "";
-        String missStr = "";
-        float prob = (float) Math.floor(Math.random() * 10);
-        //System.out.println("-------probability." + prob);
-        if (prob < 1.2) {
+    public void processAttack() {  // if an attack was ordered, process it
+        String damStr = ""; // damage message
+        String missStr = ""; // you missed message
+        float prob = (float) Math.floor(Math.random() * 10); // dice?
+        if (prob < 1.2) { // 12% chance of a clean miss
             this.damage = 0;
             damStr = "A swing and a miss!  Your enemy grins.  Hey batter, batter, batter, sssssswingggggg, batterrrrrrr!!";
             missStr = "You swing at nothing and miss - and also manage to look like a total jackass.";
-        } else if (prob < 3.8) {
+        } else if (prob < 3.8) { // 26% chance of a glancing blow
             this.damage = this.attack - 5;
             damStr = "You struck a glancing blow! Your enemy grunts and furrows their brow a bit.";
             missStr = "You attack the thin air vigorously, making it even thinner - not your best look but at least you got in a quick workout.";
-        } else {
+        } else {  // 62% chance direct hit at full strength
             this.damage = this.attack;
             damStr = "A direct hit! The smile leaves your enemy's eyes as they stumble back.";
             missStr = "You swing at what appears to be your own shadow.  Your form was perfect and you looked like a complete badass, except that there is nobody to attack.";
         }
-        if (this.name.equals("hero")) {
+        if (this.name.equals("hero")) {  // only show hit messages if its hero and enemy not "invisible"
             if (Game.nearEachOther() && Game.enemy.invisibility == 0) {
                 System.out.println(damStr);
             } else {
@@ -178,7 +168,7 @@ public class Player {
         }
     }
 
-    public void processMagic(String s) {
+    public void processMagic(String s) {  //  process any magical incantations
         switch (s) {
             case "1":
                 if (this.invisibility == 0 && this.magicItems[0] != null) {
@@ -187,9 +177,11 @@ public class Player {
                     this.turnCodes[1] = true;
                     if (this.name.equals("hero")) {
                         System.out.println("You slide the cloak over your shoulders and suddenly disappear (too bad 'cuz your coiffure looks great today). You are safe from attack for now.");
+                    } else {
+                        System.out.println("The enemy vanished into thin air.");
                     }
                 } else {
-                    System.out.println("Good try, Slick, but you don't own that item.");
+                    System.out.println("Good try, Rockstar, but you don't own that item.");
                 }
                 break;
             case "2":
@@ -199,6 +191,8 @@ public class Player {
                     this.turnCodes[2] = true;
                     if (this.name.equals("hero")) {
                         System.out.println("The gauntlet fits your hand like a.....uhhh - gauntlet, and you feel strong enough to pull the ears of a Gundark.");
+                    } else {
+                        System.out.println("The enemy donned the Gauntlet of Strength.");
                     }
                 } else {
                     System.out.println("I don't think so, mate. You don't own that item.");
@@ -211,9 +205,11 @@ public class Player {
                     this.turnCodes[3] = true;
                     if (this.name.equals("hero")) {
                         System.out.println("You drink deeply. This is better than the immuno-boost at Jamba Juice. You health begins to build.");
+                    } else {
+                        System.out.println("The enemy chugged a vile of The Tincture of Restoration.");
                     }
                 } else {
-                    System.out.println("As if you own that item.");
+                    System.out.println("As if you own that item or something.");
                 }
                 break;
             case "4":
@@ -224,9 +220,11 @@ public class Player {
                     this.turnCodes[4] = true;
                     if (this.name.equals("hero")) {
                         System.out.println("The ring slides easily onto your hand and you are surrounded by a strange protective aura.");
+                    } else {
+                        System.out.println("The enemy said 'I do' to the Ring of Protection. I bet that honeymoon 'll suck!");
                     }
                 } else {
-                    System.out.println("Uhhhhh, you need to get one to wear one.");
+                    System.out.println("Uhhhhh, you need to get one to wear one, Dufus.");
                 }
                 break;
             case "5":
@@ -236,6 +234,8 @@ public class Player {
                     this.turnCodes[5] = true;
                     if (this.name.equals("hero")) {
                         System.out.println("As you carefully place the crown atop your head, careful not to mess up your elaborate hairdo, you noticed it is adorned with jeweled wings.  Your hands seem twice as fast as before.  Hmmmmm, you ponder, I wonder if I could attack twice in the same amount of time it takes to attack once.");
+                    } else {
+                        System.out.println("The enemy messed up their do while donning the Crown of Speed.");
                     }
                 } else {
                     System.out.println("Negative, Ghost-rider, the pattern is full.  You don't own that item.");
@@ -244,7 +244,7 @@ public class Player {
         }
     }
 
-    public void getItem() {
+    public void getItem() {  // pick stuff up
         String item = "";
         boolean noItem = false;
         switch (GameMap.layout[this.positRow].charAt(this.positCol)) {
@@ -280,7 +280,8 @@ public class Player {
                     this.attack = 15;
                 } else {
                     noItem = true;
-                    if (name.equals("hero")) System.out.println("You decide to forgo the sword for the superior axe in hand.");
+                    if (name.equals("hero"))
+                        System.out.println("You decide to forgo the sword for the superior axe in hand.");
                     turnCodes[0] = false;
                 }
                 break;
@@ -288,8 +289,8 @@ public class Player {
                 item = "shield. All hits from enemies will henceforth be reduced by 5 damage.";
                 this.shield = 5;
                 break;
-            default:
-                System.out.println("There is nothing to get here.");
+            default:  // user pressed g when there is nothing to pick up
+                System.out.println("There is nothing to get here, pal.");
                 noItem = true;
                 break;
         }
@@ -297,11 +298,40 @@ public class Player {
             if (name.equals("hero")) {
                 System.out.println("You picked up the " + item + " Press I for inventory.");
             } else {
-                System.out.println("The enemy picked up the " + item);
+                System.out.println("The enemy picked up the " + item + ".  Oh, snap!");
             }
-
             this.turnCodes[0] = true;
             GameMap.layout[this.positRow] = GameMap.replaceChar(this.positCol, GameMap.layout[this.positRow], 'B');
+        }
+    }
+
+    public String generateBotMove() {  // figure out an input for the bot
+        String dir = getSafeDir();
+        if (Game.nearEachOther()) {  // if enemy in strike distance
+            if (this.health >= 50) { // attack if health above 50
+                return "A";  // attack
+            } else if (this.health >= 20) { // if between 20 and 50 use magic first then attack
+                if (this.magicItems[0] != null) {
+                    return "1";
+                } else if (this.magicItems[1] != null) {
+                    return "2";
+                } else if (this.magicItems[2] != null) {
+                    return "3";
+                } else if (this.magicItems[3] != null) {
+                    return "4";
+                } else if (this.magicItems[4] != null) {
+                    return "5";
+                } else {
+                    return "A";  // no more magic to invoke - start attacking again
+                }
+            } else { // if lower than 20 run away
+                return dir;
+            }
+            // or if there is nobody to attack and there is something to pick up, do it
+        } else if ("ASD12345".contains(String.valueOf(GameMap.layout[this.positRow].charAt(this.positCol)))) { // something to get
+            return "G";
+        } else { // otherwise just move
+            return dir;
         }
     }
 
@@ -312,18 +342,18 @@ public class Player {
                 (this.positRow == GameMap.mapRow - 1 && dir.equals("S")));
     }
 
-    public boolean edgeWall(String dir) {  // bot checking for walls when at edge
-         // the edges of the map will never have walls
-        /*
-        if col is eastmost and dir is west and w != w then move is safe
-        if col is westmost and dir is east and e != w then move is safe
-        if row is southmost and dir is north and n != w then move is safe
-        if row is northmost and dir is south and s != w then move is safe
+    public boolean edgeWall(String dir) {  // bot checking for walls when at edge of mesa - good Gawd!
+        // the edges of the map will never have walls, BTW
+        /*   Explanations for hairy booleans created to keep nesting hell down
+        if col is eastmost and dir is west and w != wall then move is safe
+        if col is westmost and dir is east and e != wall then move is safe
+        if row is southmost and dir is north and n != wall then move is safe
+        if row is northmost and dir is south and s != wall then move is safe
          and
-        if you are not on east edge and (dir is e and the string is not W) then move is safe
-        or if you are not on west edge and (dir is w and the string in not w) then move is safe
-        or if you are not on the south edge and (dir is s and the string is not w) then move is safe
-        or if you are not on the north edge and (dir is n and the string is not w) then move is safe
+        if you are not on east edge and (dir is e and the string is not Wall) then move is safe
+        or if you are not on west edge and (dir is w and the string in not wall) then move is safe
+        or if you are not on the south edge and (dir is s and the string is not wall) then move is safe
+        or if you are not on the north edge and (dir is n and the string is not wall) then move is safe
          */
         return (((this.positCol == GameMap.mapCol - 1 && (dir.equals("W") && !String.valueOf(GameMap.layout[positRow].charAt(positCol - 1)).equals("W"))) ||
                 (this.positCol == 0 && (dir.equals("E") && !String.valueOf(GameMap.layout[positRow].charAt(positCol + 1)).equals("W"))) ||
@@ -331,20 +361,16 @@ public class Player {
                 (this.positRow == 0 && (dir.equals("S") && !String.valueOf(GameMap.layout[positRow + 1].charAt(positCol)).equals("W")))))
                 ||
                 (((this.positCol != GameMap.mapCol - 1 && (dir.equals("E") && !String.valueOf(GameMap.layout[positRow].charAt(positCol + 1)).equals("W"))) ||
-                (this.positCol != 0 && (dir.equals("W") && !String.valueOf(GameMap.layout[positRow].charAt(positCol - 1)).equals("W"))) ||
-                (this.positRow != GameMap.mapRow - 1 && (dir.equals("S") && !String.valueOf(GameMap.layout[positRow + 1].charAt(positCol)).equals("W"))) ||
-                (this.positRow != 0 && (dir.equals("N") && !String.valueOf(GameMap.layout[positRow - 1].charAt(positCol)).equals("W")))));
+                        (this.positCol != 0 && (dir.equals("W") && !String.valueOf(GameMap.layout[positRow].charAt(positCol - 1)).equals("W"))) ||
+                        (this.positRow != GameMap.mapRow - 1 && (dir.equals("S") && !String.valueOf(GameMap.layout[positRow + 1].charAt(positCol)).equals("W"))) ||
+                        (this.positRow != 0 && (dir.equals("N") && !String.valueOf(GameMap.layout[positRow - 1].charAt(positCol)).equals("W")))));
     }
 
-    public boolean nonEdgeWall (String dir) {  // bot checking for walls when not at edge
+    public boolean nonEdgeWall(String dir) {  // bot checking for walls when not at edge of mesa
         String n = String.valueOf(GameMap.layout[positRow - 1].charAt(positCol));
-//        System.out.println("-------North is " + n);
         String e = String.valueOf(GameMap.layout[positRow].charAt(positCol + 1));
-//        System.out.println("-------East is " + e);
         String s = String.valueOf(GameMap.layout[positRow + 1].charAt(positCol));
-//        System.out.println("-------South is " + s);
         String w = String.valueOf(GameMap.layout[positRow].charAt(positCol - 1));
-//        System.out.println("-------West is " + w);
         return !((n.equals("W") && dir.equals("N")) ||
                 (s.equals("W") && dir.equals("S")) ||
                 (e.equals("W") && dir.equals("E")) ||
@@ -353,13 +379,13 @@ public class Player {
     }
 
     public String getSafeDir() {  // bot getting direction to try and checking it out
-        /*
-        get a dir
-        safe is false
+        /*  psuedo code for algo
+        get a random dir
+        safe = false
         while not safe
-            get a dir
+            get a random dir
             if its on the edge
-                check for a fall - if prob under threshold, if fall mark unsafe
+                check for a fall - probability under threshold? check if fall mark unsafe else dont check
                 check for a wall - if wall mark unsafe
             else...not on an edge
                 check for a wall - if wall mark unsafe
@@ -371,65 +397,16 @@ public class Player {
             safe = true;  // assume its a good direction unless proven otherwise below
             dir = getRandomDir(dir);
             if (positCol == 0 || positCol == (GameMap.mapCol - 1) || positRow == 0 || (positRow == GameMap.mapRow - 1)) {// on a cliff edge
-//                System.out.println("-------Enemy on a ledge");
                 float probSure = (float) (Math.random() * 10);  // determine if I should check if Im near a ledge
-//                System.out.println("-------Fall index is " + probSure);
-                if (probSure < 9.8) {// check for a fall 98 % of the time
+                if (probSure < 9.8) {// check for a potential fall only 98 % of the time - sometimes enemy falls off
                     safe = (!edgeFall(dir));
                 }
-//                System.out.println("-------After prob check, move " + dir + " safety is " + safe);
-                safe = safe && edgeWall(dir);
-//                System.out.println("-------safe is " + safe + " edgeWallCheck is " + edgeWall(dir));
-//                System.out.println("-------After edge wall check, move " + dir + " safety is " + safe);
+                safe = safe && edgeWall(dir);  // combine the two checks above without overriding one
             } else { // not on an edge
-//                System.out.println("-------Enemy on a ledge");
                 safe = nonEdgeWall(dir);
-//                System.out.println("-------After non-edge wall check, move " + dir + " safety is " + safe);
             }
         }
         return dir;
-    }
-
-    public String generateBotMove() {
-
-//        System.out.println("-------calculating a bot move from " + positRow + " " + positCol);
-String dir = getSafeDir();
-        if (Game.nearEachOther()) {  // if enemy in strike distance
-            if (this.health >= 50) { // attack if health above 50
-//                System.out.println("-------done calculating. A > 50");
-                return "A";
-            } else if (this.health >= 20) { // magic first then attack if between 20 and 50
-                if (this.magicItems[0] != null) {
-//                    System.out.println("-------done calculating. 1");
-                    return "1";
-                } else if (this.magicItems[1] != null) {
-//                    System.out.println("-------done calculating. 2");
-                    return "2";
-                } else if (this.magicItems[2] != null) {
-//                    System.out.println("-------done calculating. 3");
-                    return "3";
-                } else if (this.magicItems[3] != null) {
-//                    System.out.println("-------done calculating. 4");
-                    return "4";
-                } else if (this.magicItems[4] != null) {
-//                    System.out.println("-------done calculating. 5");
-                    return "5";
-                } else {
-//                    System.out.println("-------done calculating. A > 20");
-                    return "A";
-                }
-            } else { // or run away if lower than 20
-//                System.out.println("-------done calculating." + dir + " run away.");
-                return dir;
-            }
-            // or if there is no enemey and there is something to pick up, do it
-        } else if ("ASD12345".contains(String.valueOf(GameMap.layout[this.positRow].charAt(this.positCol)))) { // something to get
-//            System.out.println("-------done calculating. G");
-            return "G";
-        } else { // otherwise just move
-//            System.out.println("-------done calculating." + dir + " just moving should be no walls");
-            return dir;
-        }
     }
 
     public String getRandomDir(String dir) {  // bot getting initial direction during move process
@@ -448,9 +425,5 @@ String dir = getSafeDir();
                 break;
         }
         return dir;
-    }
-
-    public int getPositCol() {
-        return this.positCol;
     }
 }
