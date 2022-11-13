@@ -13,9 +13,7 @@ public class Game {
     private static final Scanner in = new Scanner(System.in);
     public static String endName = "none";
 
-    Game() {
-//        System.out.println("-------Constructing the Game.");
-//        this.turnNum = 1;
+    Game() {  // constructor for game object
         setState("init");
         this.title = "\n======================\n";
         this.title += "=   Rex Nemorensis   =\n";
@@ -50,25 +48,39 @@ public class Game {
  //               System.out.println("-----------------------------");
             }
         }
-        this.end(endName);
-        this.reset();
+        int exitCode = this.end(endName);
+         switch(exitCode) {
+             case 0:
+                 this.reset();
+                 break;
+             case 1:
+                 gameMap = new GameMap();
+                 protagonist = new Player("hero", false);
+                 enemy = new Player("enemy", true);
+                 break;
+             default :
+                 System.out.println("\nYou defeated " + Game.protagonist.wins + " challengers.");
+                 break;
+         }
     }
 
     private void reset() {
         setState("active");
-//        System.out.println("-------Resetting");
-        // actually write the rest code here soon
-        /*
-        move enemy 77
-        move protag 00 add narrative  hooch  almost feel sorry for them  every fighter gets their ass kicked one day
-        enemy health and shield 100+ (tied to protag wins)
-        enemy inventory empty
-        enemy attack to default
-        new map?
-        turncodes zeroed
-        enemy magics 0
-         */
-    }
+        protagonist.positRow = 0;
+        protagonist.positCol = 0;
+        protagonist.health += 25;
+        System.out.println("You make your way back to your camp to sharpen your weapons, grab some grub, and get cleaned up.\n");
+        System.out.println("You clean your loin cloth and your health improves by 25 points.\n");
+        System.out.println("Another soul has been exiled to the Grove to challenge your reign.\n");
+        System.out.println("You almost feel sorry for them, then you remember that poem.\n");
+        System.out.println(Game.poem);
+        enemy = new Player("enemy", true);
+        enemy.health += (5 * protagonist.wins);
+        enemy.shield += protagonist.wins;
+        System.out.println("The more newly exiled souls you slaughter, the stronger they get, eh?\n");
+        System.out.println("Enemy health: " + enemy.health);
+        System.out.println("Enemy shield: " + enemy.shield);
+   }
 
     public void showIntro() {
         if (protagonist.wins == 0) {
@@ -318,40 +330,40 @@ public class Game {
             enemy.invisibility--;
             if (enemy.invisibility == 0) {
                 enemy.turnCodes[1] = false;
-                enemy.magicItems[0] = null;
+//                enemy.magicItems[0] = null;
             }
         }
         if (enemy.strength > 0) {
             enemy.strength--;
             if (enemy.strength == 0) {
                 enemy.turnCodes[2] = false;
-                enemy.magicItems[1] = null;
+//                enemy.magicItems[1] = null;
             }
         }
         if (enemy.restoration > 0) {
             enemy.restoration--;
             if (enemy.restoration == 0) {
                 enemy.turnCodes[3] = false;
-                enemy.magicItems[2] = null;
+//                enemy.magicItems[2] = null;
             }
         }
         if (enemy.protection > 0) {
             enemy.protection--;
             if (enemy.protection == 0) {
                 enemy.turnCodes[4] = false;
-                enemy.magicItems[3] = null;
+//                enemy.magicItems[3] = null;
             }
         }
         if (enemy.speed > 0) {
             enemy.speed--;
             if (enemy.speed == 0) {
                 enemy.turnCodes[5] = false;
-                enemy.magicItems[4] = null;
+//                enemy.magicItems[4] = null;
             }
         }
     }
 
-    void end(String n) {
+    public int end(String n) {
 //        System.out.println("-------exit code " + n);
         System.out.println("Game over.\n");
         if (n.equals("enemy")) {
@@ -359,12 +371,15 @@ public class Game {
             protagonist.wins++;
             System.out.println("You have defeated " + protagonist.wins + " challengers.");
             System.out.println();
+            return 0;
         } else if (n.equals("hero")) {
             System.out.println("You are defeated. A haloed child touches your head. You hear their whisper from behind, 'All glory is fleeting...'");
             System.out.println();
             RexNemorensis.replay = checkReplay().startsWith("Y");
+            return 1;
         } else {
             RexNemorensis.replay = checkReplay().startsWith("Y");
+            return 2;
         }
     }
 

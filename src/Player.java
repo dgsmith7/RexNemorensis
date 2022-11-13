@@ -169,7 +169,7 @@ public class Player {
             missStr = "You swing at what appears to be your own shadow.  Your form was perfect and you looked like a complete badass, except that there is nobody to attack.";
         }
         if (this.name.equals("hero")) {
-            if (Game.nearEachOther()) {
+            if (Game.nearEachOther() && Game.enemy.invisibility == 0) {
                 System.out.println(damStr);
             } else {
                 System.out.println(missStr);
@@ -182,6 +182,7 @@ public class Player {
         switch (s) {
             case "1":
                 if (this.invisibility == 0 && this.magicItems[0] != null) {
+                    this.magicItems[0] = null;
                     this.invisibility = 4;
                     this.turnCodes[1] = true;
                     if (this.name.equals("hero")) {
@@ -193,6 +194,7 @@ public class Player {
                 break;
             case "2":
                 if (this.strength == 0 && this.magicItems[1] != null) {
+                    this.magicItems[1] = null;
                     this.strength = 4;
                     this.turnCodes[2] = true;
                     if (this.name.equals("hero")) {
@@ -204,6 +206,7 @@ public class Player {
                 break;
             case "3":
                 if (this.restoration == 0 && this.magicItems[2] != null) {
+                    this.magicItems[2] = null;
                     this.restoration = 4;
                     this.turnCodes[3] = true;
                     if (this.name.equals("hero")) {
@@ -215,6 +218,7 @@ public class Player {
                 break;
             case "4":
                 if (this.protection == 0 && this.magicItems[3] != null) {
+                    this.magicItems[3] = null;
                     this.protection = 4;
                     this.shield += 5;
                     this.turnCodes[4] = true;
@@ -227,6 +231,7 @@ public class Player {
                 break;
             case "5":
                 if (this.speed == 0 && this.magicItems[4] != null) {
+                    this.magicItems[4] = null;
                     this.speed = 4;
                     this.turnCodes[5] = true;
                     if (this.name.equals("hero")) {
@@ -244,7 +249,7 @@ public class Player {
         boolean noItem = false;
         switch (GameMap.layout[this.positRow].charAt(this.positCol)) {
             case '1':
-                item = "Cloak of invisibility: Enemy attack 0 damage for 3 turns when used.";
+                item = "Cloak of invisibility: Incoming attack 0 damage for 3 turns when used.";
                 this.magicItems[0] = item;
                 break;
             case '2':

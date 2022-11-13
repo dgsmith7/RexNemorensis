@@ -21,10 +21,10 @@ public class GameMap {
     public void generateLayout() {
         // adjust this.mapCol and mapRow appropriately
         // B - bare, W-wall, H-Hole
-        layout[0] = "12345ASD";  // for testing
-        layout[1] = "HWBBBBHB";  // for testing
-//        layout[0] = "BBBBBBBB";
-//        layout[1] = "BWBBBBHB";
+//        layout[0] = "12345ASD";  // for testing
+//        layout[1] = "HWBBBBHB";  // for testing
+        layout[0] = "BBBBBBBB";
+        layout[1] = "BWBBBBHB";
         layout[2] = "BWWWWBBB";
         layout[3] = "BWBBWBBB";
         layout[4] = "BBBBWBWB";
@@ -93,7 +93,7 @@ public class GameMap {
         if (Game.enemy.invisibility == 0) {
             report += "Your spot your enemy on coordinate " + Game.enemy.positRow + " - " + Game.enemy.positCol + "\n";
         } else {
-            report += "The enemy is invisible at the moment.  Sneaky!";
+            report += "The enemy is invisible at the moment.  Sneaky!\n";
         }
         char nChar = 'L';
         char sChar = 'L';

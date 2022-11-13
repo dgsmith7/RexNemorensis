@@ -3,19 +3,17 @@ public class RexNemorensis {
     public static boolean replay;
 
     public static void main(String[] args) {
-        replay = true;
+        replay = true;  // repeat game until lose or quit
+
         while (replay) {
             game = new Game();
             game.run();
         }
-        System.out.println("\nYou defeated " + Game.protagonist.wins + " challengers.");
     }
 }
 
 /*
 TODO
-Comments
-
 Add a probability - "you dropped youre weapon, buttefingers" when on an edge.
 Draw the map really nicely once at the beginning
 Draw an ascii image at the beginning
