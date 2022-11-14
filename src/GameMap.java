@@ -9,7 +9,6 @@ public class GameMap {
         layout = new String[mapRow];
         this.generateLayout();
         this.locateWeaponsAndMagicItems();
-        this.displayMap();
     }
 
     public void generateLayout() {
@@ -56,6 +55,14 @@ public class GameMap {
             System.out.println();
         }
         System.out.println();
+    }
+
+    public String oneLine(int row) {
+        String line = "";
+        for (int col = 0; col < mapCol; col++) {
+            line += layout[row].charAt(col) + " ";
+        }
+        return line;
     }
 
     public static String replaceChar(int i, String s, char c) {  // utility used when doing weapons pass on build

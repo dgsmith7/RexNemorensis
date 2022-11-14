@@ -15,9 +15,26 @@ public class Game {
 
     Game() {  // constructor for game object
         setState("init");
-        this.title = "\n======================\n";
-        this.title += "=   Rex Nemorensis   =\n";
-        this.title += "======================\n";
+        this.title ="\n##########################################################################################################################\n";
+        this.title += "#                        #                                                    #                                          #\n";
+        this.title += "#                        #   "+gameMap.oneLine(0)+"                                 #             \\              /             #\n";
+        this.title += "#    @@@@                #   "+gameMap.oneLine(1)+" Those trees in whose dim shadow #              \\\\          //              #\n";
+        this.title += "#    @   @               #   "+gameMap.oneLine(2)+" The ghastly priest doth reign   #          +---\\\\\\--------///---+          #\n";
+        this.title += "#    @   @  @@@  @   @   #   "+gameMap.oneLine(3)+" The priest who slew the slayer, #          |. . \\\\\\ .  . /// . .|          #\n";
+        this.title += "#    @@@@  @   @  @ @    #   "+gameMap.oneLine(4)+" And shall himself be slain.     #          | . . \\\\\\ .. /// . . |          #\n";
+        this.title += "#    @ @   @@@@@   @     #   "+gameMap.oneLine(5)+"                      -McCaulay  #          |. . . \\\\\\  /// . . .|          #\n";
+        this.title += "#    @  @  @      @ @    #   "+gameMap.oneLine(6)+"                                 #          | . . . \\\\\\/// . . . |          #\n";
+        this.title += "#    @   @  @@@@ @   @   #   "+gameMap.oneLine(7)+"                                 #          |. . . . \\\\\\/ . . . .|          #\n";
+        this.title += "#                        #                                                    #          | . . . ./\\\\\\. . . . |          #\n";
+        this.title += "#         @@    @        ######################################################           \\ . . .///\\\\\\. . . /           #\n";
+        this.title += "#         @@@   @                                                             #            \\ \\\\ ///  \\\\\\ // /            #\n";
+        this.title += "#         @  @  @   @@@   @ @@@  @@@  @ @@    @@@   @ @@   @@@   @   @@@      #             \\ \\\\// .. \\\\// /             #\n";
+        this.title += "#         @  @  @  @   @  @@@@@ @   @ @@  @  @   @  @@  @ @         @         #              -/\\\\------//\\               #\n";
+        this.title += "#         @   @ @  @@@@@  @ @ @ @   @ @      @@@@@  @   @  @@@   @   @@@      #              // \\\\    // \\\\              #\n";
+        this.title += "#         @   @@@  @      @ @ @ @   @ @      @      @   @     @  @      @     #             //            \\\\             #\n";
+        this.title += "#         @    @@   @@@@  @   @  @@@  @       @@@@  @   @  @@@   @   @@@      #                                          #\n";
+        this.title += "#                                                                             #                                          #\n";
+        this.title += "##########################################################################################################################\n";
         this.backStory = "You are a mage and warrior.  For your mettle, you have been honored to serve a priesthood for the Goddess Diana.  In this role, your final role, you\n";
         this.backStory += "have been cast atop the windswept cliffs of The Grove at Nemi.  In this place there are ruins and holes and cliff edges.  Here you are relegated to\n";
         this.backStory += "stand an endless guard until you are killed by another exiled soul.  Another like you currently stands guard awaiting your challenge to usurp their reign\n";
@@ -86,8 +103,8 @@ public class Game {
     public void showIntro() {
         if (protagonist.wins == 0) {
             System.out.println(this.title);
+            Game.getReturn();
             System.out.println(this.backStory);
-            System.out.println(poem);
             showHelpReport();
             protagonist.showStatus();
         } else {
