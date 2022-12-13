@@ -1,3 +1,5 @@
+package RexNem;
+
 public class GameMap {
     public static String[] layout;
     public static int mapCol;

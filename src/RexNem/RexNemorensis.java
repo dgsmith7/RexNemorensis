@@ -1,3 +1,5 @@
+package RexNem;
+
 public class RexNemorensis {
     public static Game game;
     public static boolean replay;

@@ -1,3 +1,5 @@
+package RexNem;
+
 import java.util.Scanner;
 
 public class Player {
